@@ -20,16 +20,11 @@ class ActivityObject {
       'name': name ?? '',
       'description': description ?? ''
     };
-  
 
-  static ActivityObject fromMap(Map<String, dynamic> map) {
-    if(map['datetime'] == null || map['duration'] == null || map['category'] == null) NullThrownError();
-    return ActivityObject(
-        datetime: DateTime.fromMillisecondsSinceEpoch(int.parse(map['datetime'] ?? '0')), 
-        duration: Duration(minutes: int.parse(map['datetime'] ?? '0')), 
-        category: map['category'] ?? '',
-        name: map['name'] == '' ? null : map['name'],
-        description: map['description'] == '' ? null : map['description']
-      );
-  }
+  ActivityObject.fromJson(Map<String, dynamic> map) :
+      datetime = DateTime.fromMillisecondsSinceEpoch(int.parse(map['datetime'] ?? '0')),
+      duration = Duration(minutes: int.parse(map['datetime'] ?? '0')), 
+      category = map['category'] ?? '',
+      name = map['name'] == '' ? null : map['name'],
+      description = map['description'] == '' ? null : map['description'];
 }

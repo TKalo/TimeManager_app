@@ -26,11 +26,7 @@ Future<List<ActivityObject>> _loadDatabase() async {
 
     print('JSON: ' + json);
 
-    Iterable dynamicList = jsonDecode(json);
-
-    return dynamicList
-        .map((dynamic) => ActivityObject.fromMap(Map<String,String>.from(dynamic)))
-        .toList();
+    return (jsonDecode(json).map<ActivityObject>((e) => ActivityObject.fromJson(e)).toList());
   } catch (e) {
     // If encountering an error, return 0
     print(e.toString());
@@ -49,9 +45,7 @@ _overwriteDatabase(List<ActivityObject> data) async {
     // Read the file
     file.writeAsString(json);
 
-    json = jsonEncode(await _loadDatabase());
-
-    print('READ: ' + json);
+    print('READ: ' + json.toString());
   } catch (e) {
     // If encountering an error, return 0
     print(e.toString());
@@ -73,14 +67,20 @@ class shared_data {
       _data.add(loadedData);
       print(loadedData.toString());
     });
-    getStream().listen((data) => _overwriteDatabase(data));
+
   }
 
   Stream<List<ActivityObject>> getStream() => _data.stream;
 
-  addActivity(ActivityObject object) async =>
-      _data.add((await _data.first)..add(object));
+  addActivity(ActivityObject object) async {
+    List<ActivityObject> newList = (await _data.first)..add(object);
+    _data.add(newList);
+    _overwriteDatabase(newList);
+  }
 
-  removeActivity(ActivityObject object) async =>
-      _data.add((await _data.first)..remove(object));
+  removeActivity(ActivityObject object) async {
+    List<ActivityObject> newList = (await _data.first)..remove(object);
+    _data.add(newList);
+    _overwriteDatabase(newList);
+  }
 }

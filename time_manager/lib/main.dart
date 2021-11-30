@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:time_manager/AddActivity.dart';
+import 'package:time_manager/Home.dart';
 import 'Routing.dart';
-
 
 void main() {
   runApp(const MyApp());
@@ -21,6 +22,10 @@ class MyApp extends StatelessWidget {
         stream: getCurrentViewStream(),
         builder: (context, AsyncSnapshot<Widget> snap) => snap.data ?? Container(),
       ),
+      routes: {
+        routes.home.name: (context) => const Home(),
+        routes.addActivity.name: (context) => AddActivity(),
+      },
     );
   }
 }

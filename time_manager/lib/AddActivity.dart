@@ -104,7 +104,7 @@ class AddActivity extends StatelessWidget {
                           category: selectedCategory ?? '',
                           name: selectedName,
                           description: selectedDescription));
-                      setCurrentView(routes.home);
+                      Navigator.pushNamed(context, routes.home.name);
 
                       selectedDateTime = selectedDuration = selectedCategory =
                           selectedName = selectedDescription = null;

@@ -10,11 +10,11 @@ class Home extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xfff5f5f5),
+
       body: const Body(),
+      
       floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          setCurrentView(routes.addActivity);
-        },
+        onPressed: () => Navigator.pushNamed(context, routes.addActivity.name),
         child: const Icon(Icons.add),
       ),
     );

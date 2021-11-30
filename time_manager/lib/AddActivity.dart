@@ -98,7 +98,7 @@ class AddActivity extends StatelessWidget {
                         selectedDateTime != null &&
                         selectedDuration != null &&
                         selectedCategory != null) {
-                      Database().addToDatabase(ActivityObject(
+                      shared_data().addActivity(ActivityObject(
                           datetime: selectedDateTime ?? DateTime(0, 0, 0, 0),
                           duration: selectedDuration ?? const Duration(),
                           category: selectedCategory ?? '',

@@ -1,19 +1,19 @@
 import 'dart:async';
 import 'dart:convert';
-import 'dart:developer';
 import 'dart:io';
 
 import 'package:path_provider/path_provider.dart';
+import 'package:rxdart/rxdart.dart';
 import 'package:time_manager/ActivityObject.dart';
 
-Future<String> get _localPath async {
-  final directory = await getApplicationDocumentsDirectory();
-
-  return directory.path;
-}
+Future<String> get _localPath async =>
+    (await getApplicationDocumentsDirectory()).path;
 
 Future<File> get _localFile async {
   final path = await _localPath;
+
+  print('FILEPATH: ' + (await _localPath).toString());
+
   return File('$path/database.txt');
 }
 
@@ -24,12 +24,16 @@ Future<List<ActivityObject>> _loadDatabase() async {
     // Read the file
     final json = await file.readAsString();
 
-    List<Map<String, String>> rawObjects = jsonDecode(json);
+    print('JSON: ' + json);
 
-    return rawObjects.map((map) => ActivityObject.fromMap(map)).toList();
+    Iterable dynamicList = jsonDecode(json);
+
+    return dynamicList
+        .map((dynamic) => ActivityObject.fromMap(Map<String,String>.from(dynamic)))
+        .toList();
   } catch (e) {
     // If encountering an error, return 0
-    log(e.toString());
+    print(e.toString());
     return [];
   }
 }
@@ -38,34 +42,45 @@ _overwriteDatabase(List<ActivityObject> data) async {
   try {
     final file = await _localFile;
 
+    String json = jsonEncode(data.map((object) => object.toMap()).toList());
+
+    print('WRITE: ' + json);
+
     // Read the file
-    file.writeAsString(
-        jsonEncode(data.map((object) => object.toMap()).toList()));
+    file.writeAsString(json);
+
+    json = jsonEncode(await _loadDatabase());
+
+    print('READ: ' + json);
   } catch (e) {
     // If encountering an error, return 0
-    log(e.toString());
+    print(e.toString());
     return [];
   }
 }
 
-StreamController<List<ActivityObject>> _data = StreamController.broadcast();
+class shared_data {
+  static final shared_data _singleton = shared_data._internal();
+  factory shared_data() => _singleton;
+  shared_data._internal() {
+    initial();
+  }
+  final BehaviorSubject<List<ActivityObject>> _data =
+      BehaviorSubject.seeded([]);
 
-class Database {
-  static final Database _singleton = Database._internal();
-  factory Database() => _singleton;
-
-  Database._internal() {
-    _data.add([]);
-    _loadDatabase().then((loadedData) => _data.add(loadedData));
+  initial() {
+    _loadDatabase().then((loadedData) {
+      _data.add(loadedData);
+      print(loadedData.toString());
+    });
     getStream().listen((data) => _overwriteDatabase(data));
-
-    getStream().listen((event) => print('DATA: ' + event.length.toString()));
   }
 
   Stream<List<ActivityObject>> getStream() => _data.stream;
 
-  addToDatabase(ActivityObject object) async {
-    print(object.toMap());
-    _data.add([object,object]);
-  }
+  addActivity(ActivityObject object) async =>
+      _data.add((await _data.first)..add(object));
+
+  removeActivity(ActivityObject object) async =>
+      _data.add((await _data.first)..remove(object));
 }

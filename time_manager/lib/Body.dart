@@ -36,16 +36,13 @@ class Body extends StatelessWidget {
                         blurRadius: 6)
                   ]),
               child: StreamBuilder<List<ActivityObject>>(
-                stream: Database().getStream(),
+                stream: shared_data().getStream(),
                 builder: (BuildContext context,
                     AsyncSnapshot<List<ActivityObject>> snapshot) {
                   List<ActivityObject> data = snapshot.data ?? [];
                   final DateTime now = DateTime.now();
-                  data.removeWhere((object) =>
-                      object.datetime.isBefore(DateTime(
-                          now.year, now.month, now.day, 0, 0, 0, 0, 0)) ||
-                      object.datetime.isAfter(DateTime(
-                          now.year, now.month, now.day, 0, 0, 0, 0, 0)));
+
+                  print('streambuilder data: ' + data.length.toString());
 
                   return ListView.separated(
                     itemBuilder: (c, i) {
@@ -54,7 +51,7 @@ class Body extends StatelessWidget {
                     separatorBuilder: (c, i) => Container(
                       height: 20,
                     ),
-                    itemCount: 2,
+                    itemCount: data.length,
                   );
                 },
               ),

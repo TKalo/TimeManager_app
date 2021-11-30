@@ -22,7 +22,7 @@ class ActivityObject {
     };
   
 
-  static ActivityObject fromMap(Map<String, String> map) {
+  static ActivityObject fromMap(Map<String, dynamic> map) {
     if(map['datetime'] == null || map['duration'] == null || map['category'] == null) NullThrownError();
     return ActivityObject(
         datetime: DateTime.fromMillisecondsSinceEpoch(int.parse(map['datetime'] ?? '0')), 

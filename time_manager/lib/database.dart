@@ -56,11 +56,9 @@ _overwriteDatabase(List<ActivityObject> data) async {
 class shared_data {
   static final shared_data _singleton = shared_data._internal();
   factory shared_data() => _singleton;
-  shared_data._internal() {
-    initial();
-  }
-  final BehaviorSubject<List<ActivityObject>> _data =
-      BehaviorSubject.seeded([]);
+  shared_data._internal() {initial();}
+  final BehaviorSubject<List<ActivityObject>> _data = BehaviorSubject.seeded([]);
+  final BehaviorSubject<int> _dayOffset = BehaviorSubject.seeded(0);
 
   initial() {
     _loadDatabase().then((loadedData) {
@@ -71,6 +69,7 @@ class shared_data {
   }
 
   Stream<List<ActivityObject>> getStream() => _data.stream;
+  Stream<int> getDayOffsetStream() => _dayOffset.stream;
 
   addActivity(ActivityObject object) async {
     List<ActivityObject> newList = (await _data.first)..add(object);
@@ -82,5 +81,15 @@ class shared_data {
     List<ActivityObject> newList = (await _data.first)..remove(object);
     _data.add(newList);
     _overwriteDatabase(newList);
+  }
+
+  increaseDayOffset() async {
+    int newOffset = (await _dayOffset.first) + 1;
+    _dayOffset.add(newOffset);
+  }
+
+  reduceDayOffset() async {
+    int newOffset = (await _dayOffset.first) - 1;
+    _dayOffset.add(newOffset);
   }
 }

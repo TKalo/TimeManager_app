@@ -18,8 +18,6 @@ class AddActivity extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    TextEditingController timeContoller = TextEditingController();
-
     return Material(
       child: ListView(padding: const EdgeInsets.all(48), children: [
         Form(
@@ -59,38 +57,11 @@ class AddActivity extends StatelessWidget {
                 onChanged: (string) => selectedDescription = string,
               ),
 
-              TextFormField(
-                  controller: timeContoller,
-                  keyboardType: TextInputType.multiline,
-                  decoration: const InputDecoration(
-                      labelText: 'Activity time', border: OutlineInputBorder()),
-                  readOnly: true,
-                  onTap: () async {
-                    Future<TimeOfDay?> startTime = showTimePicker(
-                        context: context, initialTime: TimeOfDay.now());
-
-                    startTime.then((starttime) {
-                      if (starttime != null) {
-                        Future<TimeOfDay?> endTime = showTimePicker(
-                            context: context, initialTime: starttime);
-
-                        endTime.then((endtime) {
-                          if (endtime != null) {
-                            timeContoller.text = (starttime.format(context) +
-                                " - " +
-                                endtime.format(context));
-
-                            DateTime now = DateTime.now();
-                            selectedDateTime = DateTime(now.year, now.month,
-                                now.day, starttime.hour, starttime.minute);
-                            selectedDuration = selectedDateTime?.difference(
-                                DateTime(now.year, now.month, now.day,
-                                    endtime.hour, endtime.minute));
-                          }
-                        });
-                      }
-                    });
-                  }),
+              TimePicker(
+                  onTimeSelected: (DateTime datetime, Duration duration) {
+                selectedDateTime = datetime;
+                selectedDuration = duration;
+              }),
 
               TextButton(
                   onPressed: () async {
@@ -133,5 +104,60 @@ class AddActivity extends StatelessWidget {
         ),
       ]),
     );
+  }
+}
+
+class TimePicker extends StatelessWidget {
+  final Function(DateTime datetime, Duration duration) onTimeSelected;
+  const TimePicker({Key? key, required this.onTimeSelected}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    TextEditingController timeContoller = TextEditingController();
+
+    return TextFormField(
+        controller: timeContoller,
+        keyboardType: TextInputType.multiline,
+        decoration: const InputDecoration(
+            labelText: 'Activity time', border: OutlineInputBorder()),
+        readOnly: true,
+        onTap: () async {
+          Future<TimeOfDay?> startTime =
+              showTimePicker(context: context, initialTime: TimeOfDay.now());
+
+          startTime.then((starttime) {
+            if (starttime != null) {
+              Future<TimeOfDay?> endTime =
+                  showTimePicker(context: context, initialTime: starttime);
+
+              endTime.then((endtime) async {
+                if (endtime != null) {
+                  timeContoller.text = (starttime.format(context) +
+                      " - " +
+                      endtime.format(context));
+                  int offset = await shared_data().getDayOffsetStream().first;
+                  DateTime selectedDate = offset > 0
+                      ? DateTime.now().add(Duration(days: offset))
+                      : DateTime.now().subtract(Duration(days: offset));
+
+                  DateTime finalDate = DateTime(
+                      selectedDate.year,
+                      selectedDate.month,
+                      selectedDate.day,
+                      starttime.hour,
+                      starttime.minute);
+                  Duration finalDuration = finalDate.difference(DateTime(
+                      selectedDate.year,
+                      selectedDate.month,
+                      selectedDate.day,
+                      endtime.hour,
+                      endtime.minute));
+
+                  onTimeSelected(finalDate, finalDuration);
+                }
+              });
+            }
+          });
+        });
   }
 }

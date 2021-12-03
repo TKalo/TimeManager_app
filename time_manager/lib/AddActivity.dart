@@ -139,19 +139,26 @@ pickTime(Function(DateTime datetime, Duration duration) onTimeSelected,
 
 pickTimeRange(Function(DateTime datetime, Duration duration) onTimeSelected,
     BuildContext context) async {
-  TimeRange result = await showTimeRangePicker(
+  TimeRange interval = await showTimeRangePicker(
     context: context,
     interval: const Duration(minutes: 5),
   );
 
-  List<ActivityObject> data = await shared_data().getStream().first;
   int offset = await shared_data().getDayOffsetStream().first;
   DateTime selectedDate = DateTime.now().add(Duration(days: offset));
-  List<ActivityObject> selectedData = data
-      .where((object) => checkDateTimesOnSameDay(object.datetime, selectedDate))
-      .toList();
 
-  //TODO: check that no other activities are logged for this time period
+  DateTime selectedStartDateTime = DateTime(
+      selectedDate.year,
+      selectedDate.month,
+      selectedDate.day,
+      interval.startTime.hour,
+      interval.startTime.minute);
+
+  DateTime selectedEndDateTime = DateTime(selectedDate.year, selectedDate.month,
+      selectedDate.day, interval.endTime.hour, interval.endTime.minute);
+
+  onTimeSelected(selectedStartDateTime,
+      selectedStartDateTime.difference(selectedEndDateTime));
 }
 
 void onSubmit(
@@ -161,6 +168,20 @@ void onSubmit(
     String? selectedName,
     String? selectedDescription,
     BuildContext context) async {
+  //TODO: check that no other activities are logged for this time period
+
+  List<ActivityObject> data = await shared_data().getStream().first;
+  List<ActivityObject> selectedData = data
+      .where((object) => checkDateTimesOnSameDay(
+          object.datetime, selectedDateTime ?? DateTime.now()))
+      .toList();
+
+  //If any are at the same time, ask if user will crop them, this, or cancel
+  if (checkAnyActivitiesInTimeInterval(selectedDateTime, selectedDuration, selectedData)) {
+  } else {
+
+  }
+
   shared_data().addActivity(ActivityObject(
       datetime: selectedDateTime ?? DateTime(0, 0, 0, 0),
       duration: selectedDuration ?? const Duration(),
@@ -171,4 +192,21 @@ void onSubmit(
 
   selectedDateTime = selectedDuration =
       selectedCategory = selectedName = selectedDescription = null;
+}
+
+
+
+bool checkAnyActivitiesInTimeInterval(
+    DateTime selectedStartDateTime,
+    Duration selectedDuration,
+    List<ActivityObject> activities) {
+  return activities.any((element) {
+    DateTime selectedEndDateTime = selectedStartDateTime.add(selectedDuration);
+
+    DateTime elementStartDateTime = element.datetime;
+    DateTime elementEndDateTime = elementStartDateTime.add(element.duration);
+
+    return elementStartDateTime.isBefore(selectedEndDateTime) &&
+        elementEndDateTime.isAfter(selectedStartDateTime);
+  });
 }

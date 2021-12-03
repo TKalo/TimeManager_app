@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:time_manager/ActivityObject.dart';
 import 'package:time_manager/Routing.dart';
+import 'package:time_range_picker/time_range_picker.dart';
 
 import 'database.dart';
+import 'helpers.dart';
 
 class AddActivity extends StatelessWidget {
   AddActivity({Key? key}) : super(key: key);
@@ -10,14 +12,16 @@ class AddActivity extends StatelessWidget {
 
   final types = ['fun', 'nothing', 'necessary', 'productive'];
 
-  String? selectedCategory;
-  DateTime? selectedDateTime;
-  Duration? selectedDuration;
-  String? selectedName;
-  String? selectedDescription;
-
   @override
   Widget build(BuildContext context) {
+    TextEditingController timeContoller = TextEditingController();
+
+    String? selectedCategory;
+    DateTime? selectedDateTime;
+    Duration? selectedDuration;
+    String? selectedName;
+    String? selectedDescription;
+
     return Material(
       child: ListView(padding: const EdgeInsets.all(48), children: [
         Form(
@@ -56,40 +60,33 @@ class AddActivity extends StatelessWidget {
                 maxLines: 10,
                 onChanged: (string) => selectedDescription = string,
               ),
-
-              TimePicker(
-                  onTimeSelected: (DateTime datetime, Duration duration) {
-                selectedDateTime = datetime;
-                selectedDuration = duration;
-              }),
+              TextFormField(
+                controller: timeContoller,
+                keyboardType: TextInputType.multiline,
+                decoration: const InputDecoration(
+                    labelText: 'Activity time', border: OutlineInputBorder()),
+                readOnly: true,
+                onTap: () {
+                  pickTimeRange((datetime, duration) {
+                    selectedDateTime = datetime;
+                    selectedDuration = duration;
+                    timeContoller.text = (datetime.toString() +
+                        " - " +
+                        datetime.add(duration).toString());
+                  }, context);
+                },
+              ),
 
               TextButton(
                   onPressed: () async {
-                    if ((_formKey.currentState?.validate() ?? false) &&
-                        selectedDateTime != null &&
-                        selectedDuration != null &&
-                        selectedCategory != null) {
-                      shared_data().addActivity(ActivityObject(
-                          datetime: selectedDateTime ?? DateTime(0, 0, 0, 0),
-                          duration: selectedDuration ?? const Duration(),
-                          category: selectedCategory ?? '',
-                          name: selectedName,
-                          description: selectedDescription));
-                      Navigator.pushNamed(context, routes.home.name);
-
-                      selectedDateTime = selectedDuration = selectedCategory =
-                          selectedName = selectedDescription = null;
-                    } else {
-                      print(selectedDateTime.toString() +
-                          "\n" +
-                          selectedDuration.toString() +
-                          "\n" +
-                          selectedCategory.toString() +
-                          "\n" +
-                          selectedName.toString() +
-                          "\n" +
-                          selectedDescription.toString() +
-                          "\n");
+                    if (_formKey.currentState?.validate() ?? false) {
+                      onSubmit(
+                          selectedCategory,
+                          selectedDateTime,
+                          selectedDuration,
+                          selectedName,
+                          selectedDescription,
+                          context);
                     }
                   },
                   child: Container(
@@ -107,57 +104,71 @@ class AddActivity extends StatelessWidget {
   }
 }
 
-class TimePicker extends StatelessWidget {
-  final Function(DateTime datetime, Duration duration) onTimeSelected;
-  const TimePicker({Key? key, required this.onTimeSelected}) : super(key: key);
+pickTime(Function(DateTime datetime, Duration duration) onTimeSelected,
+    BuildContext context) async {
+  Future<TimeOfDay?> startTime =
+      showTimePicker(context: context, initialTime: TimeOfDay.now());
 
-  @override
-  Widget build(BuildContext context) {
-    TextEditingController timeContoller = TextEditingController();
+  startTime.then((starttime) {
+    if (starttime != null) {
+      Future<TimeOfDay?> endTime =
+          showTimePicker(context: context, initialTime: starttime);
 
-    return TextFormField(
-        controller: timeContoller,
-        keyboardType: TextInputType.multiline,
-        decoration: const InputDecoration(
-            labelText: 'Activity time', border: OutlineInputBorder()),
-        readOnly: true,
-        onTap: () async {
-          Future<TimeOfDay?> startTime =
-              showTimePicker(context: context, initialTime: TimeOfDay.now());
+      endTime.then((endtime) async {
+        if (endtime != null) {
+          int offset = await shared_data().getDayOffsetStream().first;
+          DateTime selectedDate = offset > 0
+              ? DateTime.now().add(Duration(days: offset))
+              : DateTime.now().subtract(Duration(days: offset));
 
-          startTime.then((starttime) {
-            if (starttime != null) {
-              Future<TimeOfDay?> endTime =
-                  showTimePicker(context: context, initialTime: starttime);
+          DateTime finalDate = DateTime(selectedDate.year, selectedDate.month,
+              selectedDate.day, starttime.hour, starttime.minute);
+          Duration finalDuration = -finalDate.difference(DateTime(
+              selectedDate.year,
+              selectedDate.month,
+              selectedDate.day,
+              endtime.hour,
+              endtime.minute));
 
-              endTime.then((endtime) async {
-                if (endtime != null) {
-                  timeContoller.text = (starttime.format(context) +
-                      " - " +
-                      endtime.format(context));
-                  int offset = await shared_data().getDayOffsetStream().first;
-                  DateTime selectedDate = offset > 0
-                      ? DateTime.now().add(Duration(days: offset))
-                      : DateTime.now().subtract(Duration(days: offset));
+          onTimeSelected(finalDate, finalDuration);
+        }
+      });
+    }
+  });
+}
 
-                  DateTime finalDate = DateTime(
-                      selectedDate.year,
-                      selectedDate.month,
-                      selectedDate.day,
-                      starttime.hour,
-                      starttime.minute);
-                  Duration finalDuration = finalDate.difference(DateTime(
-                      selectedDate.year,
-                      selectedDate.month,
-                      selectedDate.day,
-                      endtime.hour,
-                      endtime.minute));
+pickTimeRange(Function(DateTime datetime, Duration duration) onTimeSelected,
+    BuildContext context) async {
+  TimeRange result = await showTimeRangePicker(
+    context: context,
+    interval: const Duration(minutes: 5),
+  );
 
-                  onTimeSelected(finalDate, finalDuration);
-                }
-              });
-            }
-          });
-        });
-  }
+  List<ActivityObject> data = await shared_data().getStream().first;
+  int offset = await shared_data().getDayOffsetStream().first;
+  DateTime selectedDate = DateTime.now().add(Duration(days: offset));
+  List<ActivityObject> selectedData = data
+      .where((object) => checkDateTimesOnSameDay(object.datetime, selectedDate))
+      .toList();
+
+  //TODO: check that no other activities are logged for this time period
+}
+
+void onSubmit(
+    String? selectedCategory,
+    DateTime? selectedDateTime,
+    Duration? selectedDuration,
+    String? selectedName,
+    String? selectedDescription,
+    BuildContext context) async {
+  shared_data().addActivity(ActivityObject(
+      datetime: selectedDateTime ?? DateTime(0, 0, 0, 0),
+      duration: selectedDuration ?? const Duration(),
+      category: selectedCategory ?? '',
+      name: selectedName,
+      description: selectedDescription));
+  Navigator.pushNamed(context, routes.home.name);
+
+  selectedDateTime = selectedDuration =
+      selectedCategory = selectedName = selectedDescription = null;
 }

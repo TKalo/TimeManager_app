@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:time_manager/database.dart';
 import 'ActivityObject.dart';
-import 'Navbar.dart';
+import 'helpers.dart';
 
 class Body extends StatelessWidget {
   const Body({Key? key}) : super(key: key);
@@ -10,7 +11,7 @@ class Body extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: const [
-        Diagram(),
+        Head(),
         Expanded(
           child: ActivityList(),
         )
@@ -19,8 +20,8 @@ class Body extends StatelessWidget {
   }
 }
 
-class Diagram extends StatelessWidget {
-  const Diagram({Key? key}) : super(key: key);
+class Head extends StatelessWidget {
+  const Head({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -46,6 +47,11 @@ class Diagram extends StatelessWidget {
                 color: Colors.white,
               ),
             ),
+
+            const Expanded(
+              child: Diagram()
+            ),
+
             IconButton(
               onPressed: () => shared_data().increaseDayOffset(),
               icon: const Icon(
@@ -58,6 +64,43 @@ class Diagram extends StatelessWidget {
       ),
       onHorizontalDragEnd: (DragEndDetails details) {},
       onHorizontalDragStart: (DragStartDetails details) {},
+    );
+  }
+}
+
+class Diagram extends StatelessWidget {
+  const Diagram({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return StreamBuilder<List<ActivityObject>>(
+      stream: shared_data().getStream(),
+      builder:
+          (BuildContext context, AsyncSnapshot<List<ActivityObject>> snapshot) {
+        List<ActivityObject> data = snapshot.data ?? [];
+        data.sort((a, b) => a.datetime.compareTo(b.datetime));
+
+        return StreamBuilder<int>(
+            stream: shared_data().getDayOffsetStream(),
+            builder: (context, snapshot) {
+              int offset = snapshot.data ?? 0;
+              DateTime selectedDate =
+                  DateTime.now().add(Duration(days: offset));
+              List<ActivityObject> selectedData = data
+                  .where((object) =>
+                      checkDateTimesOnSameDay(object.datetime, selectedDate))
+                  .toList();
+
+              return SfCircularChart(
+                series: <DoughnutSeries<ActivityObject, String>>[
+                  DoughnutSeries(
+                      dataSource: selectedData,
+                      xValueMapper: (ActivityObject object, int index) => object.category,
+                      yValueMapper: (ActivityObject object, int index) => object.duration.inMinutes)
+                ],
+              );
+            });
+      },
     );
   }
 }
@@ -147,13 +190,4 @@ class ActivityListItem extends StatelessWidget {
       ),
     );
   }
-}
-
-String getTimeString(DateTime dateTime) =>
-    dateTime.hour.toString() + ":" + dateTime.minute.toString();
-
-bool checkDateTimesOnSameDay(DateTime date1, DateTime date2) {
-  DateTime cleanDate1 = DateTime(date1.year, date1.month, date1.day);
-  DateTime cleanDate2 = DateTime(date2.year, date2.month, date2.day);
-  return cleanDate1.isAtSameMomentAs(cleanDate2);
 }

@@ -23,7 +23,7 @@ class ActivityObject {
 
   ActivityObject.fromJson(Map<String, dynamic> map) :
       datetime = DateTime.fromMillisecondsSinceEpoch(int.parse(map['datetime'] ?? '0')),
-      duration = Duration(minutes: int.parse(map['datetime'] ?? '0')), 
+      duration = Duration(minutes: int.parse(map['duration'] ?? '0')), 
       category = map['category'] ?? '',
       name = map['name'] == '' ? null : map['name'],
       description = map['description'] == '' ? null : map['description'];

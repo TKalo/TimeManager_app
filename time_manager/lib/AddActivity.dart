@@ -16,11 +16,10 @@ class AddActivity extends StatelessWidget {
   Widget build(BuildContext context) {
     TextEditingController timeContoller = TextEditingController();
 
-    String? selectedCategory;
-    DateTime? selectedDateTime;
-    Duration? selectedDuration;
-    String? selectedName;
-    String? selectedDescription;
+    ActivityObject activity = ActivityObject(
+        datetime: DateTime.now(),
+        duration: const Duration(seconds: 0),
+        category: '');
 
     return Material(
       child: ListView(padding: const EdgeInsets.all(48), children: [
@@ -33,7 +32,7 @@ class AddActivity extends StatelessWidget {
             direction: Axis.horizontal,
             children: [
               DropdownButtonFormField<String>(
-                onChanged: (item) => selectedCategory = item,
+                onChanged: (item) => activity.category = item ?? '',
                 items: types
                     .map((e) => DropdownMenuItem(
                           child: Text(e),
@@ -49,7 +48,7 @@ class AddActivity extends StatelessWidget {
                 decoration: const InputDecoration(
                     labelText: 'Activity Name', border: OutlineInputBorder()),
                 maxLength: 30,
-                onChanged: (string) => selectedName = string,
+                onChanged: (string) => activity.name = string,
               ),
 
               TextFormField(
@@ -58,8 +57,9 @@ class AddActivity extends StatelessWidget {
                     labelText: 'Activity Description',
                     border: OutlineInputBorder()),
                 maxLines: 10,
-                onChanged: (string) => selectedDescription = string,
+                onChanged: (string) => activity.description = string,
               ),
+
               TextFormField(
                 controller: timeContoller,
                 keyboardType: TextInputType.multiline,
@@ -68,8 +68,8 @@ class AddActivity extends StatelessWidget {
                 readOnly: true,
                 onTap: () {
                   pickTimeRange((datetime, duration) {
-                    selectedDateTime = datetime;
-                    selectedDuration = duration;
+                    activity.datetime = datetime;
+                    activity.duration = duration;
                     timeContoller.text = (datetime.toString() +
                         " - " +
                         datetime.add(duration).toString());
@@ -80,13 +80,7 @@ class AddActivity extends StatelessWidget {
               TextButton(
                   onPressed: () async {
                     if (_formKey.currentState?.validate() ?? false) {
-                      onSubmit(
-                          selectedCategory,
-                          selectedDateTime,
-                          selectedDuration,
-                          selectedName,
-                          selectedDescription,
-                          context);
+                      onSubmit(activity, context);
                     }
                   },
                   child: Container(
@@ -102,39 +96,6 @@ class AddActivity extends StatelessWidget {
       ]),
     );
   }
-}
-
-pickTime(Function(DateTime datetime, Duration duration) onTimeSelected,
-    BuildContext context) async {
-  Future<TimeOfDay?> startTime =
-      showTimePicker(context: context, initialTime: TimeOfDay.now());
-
-  startTime.then((starttime) {
-    if (starttime != null) {
-      Future<TimeOfDay?> endTime =
-          showTimePicker(context: context, initialTime: starttime);
-
-      endTime.then((endtime) async {
-        if (endtime != null) {
-          int offset = await shared_data().getDayOffsetStream().first;
-          DateTime selectedDate = offset > 0
-              ? DateTime.now().add(Duration(days: offset))
-              : DateTime.now().subtract(Duration(days: offset));
-
-          DateTime finalDate = DateTime(selectedDate.year, selectedDate.month,
-              selectedDate.day, starttime.hour, starttime.minute);
-          Duration finalDuration = -finalDate.difference(DateTime(
-              selectedDate.year,
-              selectedDate.month,
-              selectedDate.day,
-              endtime.hour,
-              endtime.minute));
-
-          onTimeSelected(finalDate, finalDuration);
-        }
-      });
-    }
-  });
 }
 
 pickTimeRange(Function(DateTime datetime, Duration duration) onTimeSelected,
@@ -158,55 +119,118 @@ pickTimeRange(Function(DateTime datetime, Duration duration) onTimeSelected,
       selectedDate.day, interval.endTime.hour, interval.endTime.minute);
 
   onTimeSelected(selectedStartDateTime,
-      selectedStartDateTime.difference(selectedEndDateTime));
+      -selectedStartDateTime.difference(selectedEndDateTime));
 }
 
-void onSubmit(
-    String? selectedCategory,
-    DateTime? selectedDateTime,
-    Duration? selectedDuration,
-    String? selectedName,
-    String? selectedDescription,
-    BuildContext context) async {
+void onSubmit(ActivityObject activity, BuildContext context) async {
   //TODO: check that no other activities are logged for this time period
 
   List<ActivityObject> data = await shared_data().getStream().first;
   List<ActivityObject> selectedData = data
-      .where((object) => checkDateTimesOnSameDay(
-          object.datetime, selectedDateTime ?? DateTime.now()))
+      .where((object) =>
+          checkDateTimesOnSameDay(object.datetime, activity.datetime))
       .toList();
+  List<ActivityObject> intersectingActivities =
+      getActivitiesInSameTimeInterval(selectedData, activity);
 
   //If any are at the same time, ask if user will crop them, this, or cancel
-  if (checkAnyActivitiesInTimeInterval(selectedDateTime, selectedDuration, selectedData)) {
+  if (intersectingActivities.isNotEmpty) {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: const Text(
+                'other activities intersect the selected time interval'),
+            actions: [
+              TextButton(onPressed: () => cropThisActivity(intersectingActivities, activity), child: Text('crop this activity')),
+              TextButton(
+                  onPressed: () {}, child: Text('crop other activities')),
+              TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: Text('cancel'))
+            ],
+          );
+        });
   } else {
-
+    shared_data().addActivity(activity);
+    Navigator.pushNamed(context, routes.home.name);
   }
 
-  shared_data().addActivity(ActivityObject(
-      datetime: selectedDateTime ?? DateTime(0, 0, 0, 0),
-      duration: selectedDuration ?? const Duration(),
-      category: selectedCategory ?? '',
-      name: selectedName,
-      description: selectedDescription));
-  Navigator.pushNamed(context, routes.home.name);
-
-  selectedDateTime = selectedDuration =
-      selectedCategory = selectedName = selectedDescription = null;
+  activity = ActivityObject(
+      datetime: DateTime.now(),
+      duration: const Duration(seconds: 0),
+      category: '');
 }
 
+cropOtherActivities(
+    List<ActivityObject> existingActivities, ActivityObject newActivity) {
+  DateTime newStartDT = newActivity.datetime;
+  DateTime newEndDT = newStartDT.add(newActivity.duration);
 
+  existingActivities.forEach((existingActivity) {
+    DateTime existingStartDT = newActivity.datetime;
+    DateTime existingEndDT = newStartDT.add(newActivity.duration);
 
-bool checkAnyActivitiesInTimeInterval(
-    DateTime selectedStartDateTime,
-    Duration selectedDuration,
-    List<ActivityObject> activities) {
-  return activities.any((element) {
-    DateTime selectedEndDateTime = selectedStartDateTime.add(selectedDuration);
-
-    DateTime elementStartDateTime = element.datetime;
-    DateTime elementEndDateTime = elementStartDateTime.add(element.duration);
-
-    return elementStartDateTime.isBefore(selectedEndDateTime) &&
-        elementEndDateTime.isAfter(selectedStartDateTime);
+    if (existingStartDT.isBefore(newStartDT) &&
+        existingEndDT.isAfter(newEndDT)) {
+      //DELETE ACTIVITY
+    } else if (existingStartDT.isBefore(newStartDT)) {
+      //CHANGE DURATION
+    } else if (existingEndDT.isAfter(newEndDT)) {
+      //CHANGE DATETIME
+    }
   });
+}
+
+cropThisActivity(
+    List<ActivityObject> existingActivities, ActivityObject newActivity) {
+  //SORT OBJECTS BY DATETIME
+  existingActivities.sort((o1, o2) => o1.datetime.compareTo(o2.datetime));
+
+  List<ActivityObject> croppedActivities = [];
+
+  for (int x = 0; x < existingActivities.length-1; x++) {
+    if (x == 0) {
+      if (existingActivities[x].datetime.isAfter(newActivity.datetime)) {
+        croppedActivities.add(ActivityObject(
+            datetime: newActivity.datetime,
+            duration: -newActivity.datetime
+                .difference(existingActivities[x].datetime),
+            category: newActivity.category,
+            name: newActivity.name,
+            description: newActivity.description));
+      }
+      } else if (existingActivities[x].datetime.isAfter(
+          existingActivities[x - 1]
+              .datetime
+              .add(existingActivities[x - 1].duration))) {
+        DateTime endtime = existingActivities[x - 1]
+            .datetime
+            .add(existingActivities[x - 1].duration);
+
+        croppedActivities.add(ActivityObject(
+            datetime: endtime,
+            duration: endtime.difference(existingActivities[x].datetime),
+            category: newActivity.category,
+            name: newActivity.name,
+            description: newActivity.description));
+    }
+  }
+  
+  croppedActivities.forEach((activity) => shared_data().addActivity(activity));
+}
+
+List<ActivityObject> getActivitiesInSameTimeInterval(
+    List<ActivityObject> existingActivities, ActivityObject newActivity) {
+  return existingActivities.where((existingActivity) {
+    DateTime newEndDT = newActivity.datetime.add(newActivity.duration);
+
+    DateTime existingStartDT = existingActivity.datetime;
+    DateTime existingEndDT = existingStartDT.add(existingActivity.duration);
+
+    return existingStartDT.isBefore(newEndDT) &&
+            existingStartDT.isAfter(newActivity.datetime) ||
+        existingEndDT.isBefore(newEndDT) &&
+            existingEndDT.isAfter(newActivity.datetime);
+  }).toList();
 }

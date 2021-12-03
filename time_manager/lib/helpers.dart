@@ -1,9 +1,12 @@
+import 'package:time_manager/ActivityObject.dart';
+
 String getTimeString(DateTime dateTime) =>
-    dateTime.hour.toString() + ":" + dateTime.minute.toString();
+    dateTime.hour.toString().padLeft(2,'0') + ":" + dateTime.minute.toString().padLeft(2,'0');
 
-bool checkDateTimesOnSameDay(DateTime date1, DateTime date2) {
-  DateTime cleanDate1 = DateTime(date1.year, date1.month, date1.day);
-  DateTime cleanDate2 = DateTime(date2.year, date2.month, date2.day);
-  return cleanDate1.isAtSameMomentAs(cleanDate2);
-}
-
+List<ActivityObject> getSelectedDateActivities(List<ActivityObject> existingActivities, DateTime selectedDate) {
+    return existingActivities.where((existingActivity) {
+      DateTime cleanDate1 = DateTime(existingActivity.starttime.year, existingActivity.starttime.month, existingActivity.starttime.day);
+      DateTime cleanDate2 = DateTime(selectedDate.year, selectedDate.month, selectedDate.day);
+      return cleanDate1.isAtSameMomentAs(cleanDate2);
+    }).toList();
+  }

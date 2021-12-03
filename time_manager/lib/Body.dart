@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
-import 'package:time_manager/database.dart';
+import 'package:time_manager/Model.dart';
 import 'ActivityObject.dart';
 import 'helpers.dart';
 
@@ -29,31 +29,21 @@ class Head extends StatelessWidget {
       child: Container(
         height: 260,
         padding: const EdgeInsets.all(16),
-        decoration: const BoxDecoration(color: Colors.blue, boxShadow: [
-          BoxShadow(
-              color: Color(0xffd9d9d9),
-              spreadRadius: 0,
-              blurRadius: 8,
-              offset: Offset(0, 7))
-        ]),
+        decoration: const BoxDecoration(color: Colors.blue, boxShadow: [BoxShadow(color: Color(0xffd9d9d9), spreadRadius: 0, blurRadius: 8, offset: Offset(0, 7))]),
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.center,
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             IconButton(
-              onPressed: () => shared_data().reduceDayOffset(),
+              onPressed: () => Model().reduceDayOffset(),
               icon: const Icon(
                 Icons.arrow_back,
                 color: Colors.white,
               ),
             ),
-
-            const Expanded(
-              child: Diagram()
-            ),
-
+            const Expanded(child: Diagram()),
             IconButton(
-              onPressed: () => shared_data().increaseDayOffset(),
+              onPressed: () => Model().increaseDayOffset(),
               icon: const Icon(
                 Icons.arrow_forward,
                 color: Colors.white,
@@ -74,29 +64,22 @@ class Diagram extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<List<ActivityObject>>(
-      stream: shared_data().getStream(),
-      builder:
-          (BuildContext context, AsyncSnapshot<List<ActivityObject>> snapshot) {
+      stream: Model().getStream(),
+      builder: (BuildContext context, AsyncSnapshot<List<ActivityObject>> snapshot) {
         List<ActivityObject> data = snapshot.data ?? [];
-        data.sort((a, b) => a.datetime.compareTo(b.datetime));
+        data.sort((a, b) => a.starttime.compareTo(b.starttime));
 
         return StreamBuilder<int>(
-            stream: shared_data().getDayOffsetStream(),
+            stream: Model().getDayOffsetStream(),
             builder: (context, snapshot) {
               int offset = snapshot.data ?? 0;
-              DateTime selectedDate =
-                  DateTime.now().add(Duration(days: offset));
-              List<ActivityObject> selectedData = data
-                  .where((object) =>
-                      checkDateTimesOnSameDay(object.datetime, selectedDate))
-                  .toList();
+              DateTime selectedDate = DateTime.now().add(Duration(days: offset));
+              List<ActivityObject> selectedData = getSelectedDateActivities(data, selectedDate);
 
               return SfCircularChart(
                 series: <DoughnutSeries<ActivityObject, String>>[
                   DoughnutSeries(
-                      dataSource: selectedData,
-                      xValueMapper: (ActivityObject object, int index) => object.category,
-                      yValueMapper: (ActivityObject object, int index) => object.duration.inMinutes)
+                      dataSource: selectedData, xValueMapper: (ActivityObject object, int index) => object.category, yValueMapper: (ActivityObject object, int index) => -object.starttime.difference(object.endtime).inMinutes)
                 ],
               );
             });
@@ -111,26 +94,19 @@ class ActivityList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<List<ActivityObject>>(
-      stream: shared_data().getStream(),
-      builder:
-          (BuildContext context, AsyncSnapshot<List<ActivityObject>> snapshot) {
+      stream: Model().getStream(),
+      builder: (BuildContext context, AsyncSnapshot<List<ActivityObject>> snapshot) {
         List<ActivityObject> data = snapshot.data ?? [];
 
         return StreamBuilder<int>(
-          stream: shared_data().getDayOffsetStream(),
+          stream: Model().getDayOffsetStream(),
           builder: (BuildContext context, AsyncSnapshot<int> snapshot) {
             int offset = snapshot.data ?? 0;
             DateTime selectedDate = DateTime.now().add(Duration(days: offset));
-            List<ActivityObject> selectedData = data
-                .where((object) =>
-                    checkDateTimesOnSameDay(object.datetime, selectedDate))
-                .toList();
-
-            print(offset);
-            print(selectedDate.day);
+            List<ActivityObject> selectedData = getSelectedDateActivities(data, selectedDate);
 
             return ListView.builder(
-              itemBuilder: (c, i) => ActivityListItem(object: selectedData[i]),
+              itemBuilder: (c, i) => ActivityListItem(activity: selectedData[i]),
               itemCount: selectedData.length,
             );
           },
@@ -141,16 +117,16 @@ class ActivityList extends StatelessWidget {
 }
 
 class ActivityListItem extends StatelessWidget {
-  final ActivityObject object;
+  final ActivityObject activity;
 
-  const ActivityListItem({Key? key, required this.object}) : super(key: key);
+  const ActivityListItem({Key? key, required this.activity}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Dismissible(
-      key: ValueKey<ActivityObject>(object),
+      key: ValueKey<ActivityObject>(activity),
       onDismissed: (DismissDirection direction) {
-        shared_data().removeActivity(object);
+        Model().removeActivity(activity);
       },
       confirmDismiss: (DismissDirection direction) {
         return showDialog<bool>(
@@ -158,12 +134,8 @@ class ActivityListItem extends StatelessWidget {
             builder: (context) => AlertDialog(
                   title: const Text('Delete activity?'),
                   actions: [
-                    TextButton(
-                        onPressed: () => Navigator.pop(context, true),
-                        child: const Text('delete')),
-                    TextButton(
-                        onPressed: () => Navigator.pop(context, false),
-                        child: const Text('cancel')),
+                    TextButton(onPressed: () => Navigator.pop(context, true), child: const Text('delete')),
+                    TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('cancel')),
                   ],
                 ));
       },
@@ -173,13 +145,10 @@ class ActivityListItem extends StatelessWidget {
           leading: Container(
             height: 64,
             width: 64,
-            decoration:
-                const BoxDecoration(shape: BoxShape.circle, color: Colors.red),
+            decoration: const BoxDecoration(shape: BoxShape.circle, color: Colors.red),
           ),
-          title: Text(object.name ?? object.category),
-          subtitle: Text(getTimeString(object.datetime) +
-              " - " +
-              getTimeString(object.datetime.add(object.duration))),
+          title: Text(activity.name ?? activity.category),
+          subtitle: Text(getTimeString(activity.starttime) + " - " + getTimeString(activity.endtime)),
         ),
       ),
       background: Container(

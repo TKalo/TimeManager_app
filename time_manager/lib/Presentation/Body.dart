@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
-import 'package:time_manager/Model.dart';
-import 'ActivityObject.dart';
-import 'helpers.dart';
+import 'package:time_manager/Processing/MainViewModel.dart';
+import 'package:time_manager/Processing/helpers.dart';
+import 'package:time_manager/persistence/ActivityObject.dart';
+
 
 class Body extends StatelessWidget {
   const Body({Key? key}) : super(key: key);
@@ -10,7 +11,7 @@ class Body extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Column(
-      children: const [
+      children: [
         Head(),
         Expanded(
           child: ActivityList(),
@@ -21,7 +22,9 @@ class Body extends StatelessWidget {
 }
 
 class Head extends StatelessWidget {
-  const Head({Key? key}) : super(key: key);
+  Head({Key? key}) : super(key: key);
+
+  final MainViewModel mainViewModel = MainViewModel();
 
   @override
   Widget build(BuildContext context) {
@@ -35,15 +38,15 @@ class Head extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
             IconButton(
-              onPressed: () => Model().reduceDayOffset(),
+              onPressed: () async => mainViewModel.decreaseFocusDay(),
               icon: const Icon(
                 Icons.arrow_back,
                 color: Colors.white,
               ),
             ),
-            const Expanded(child: Diagram()),
+            Expanded(child: Diagram()),
             IconButton(
-              onPressed: () => Model().increaseDayOffset(),
+              onPressed: () async => mainViewModel.increaseFocusDay(),
               icon: const Icon(
                 Icons.arrow_forward,
                 color: Colors.white,
@@ -59,27 +62,30 @@ class Head extends StatelessWidget {
 }
 
 class Diagram extends StatelessWidget {
-  const Diagram({Key? key}) : super(key: key);
+  Diagram({Key? key}) : super(key: key);
+
+  final MainViewModel mainViewModel = MainViewModel();
 
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<List<ActivityObject>>(
-      stream: Model().getStream(),
+      stream: mainViewModel.getActivities(),
       builder: (BuildContext context, AsyncSnapshot<List<ActivityObject>> snapshot) {
         List<ActivityObject> data = snapshot.data ?? [];
         data.sort((a, b) => a.starttime.compareTo(b.starttime));
 
-        return StreamBuilder<int>(
-            stream: Model().getDayOffsetStream(),
+        return StreamBuilder<DateTime>(
+            stream: mainViewModel.getFocusDay(),
             builder: (context, snapshot) {
-              int offset = snapshot.data ?? 0;
-              DateTime selectedDate = DateTime.now().add(Duration(days: offset));
+              DateTime selectedDate = snapshot.data ?? DateTime.now();
               List<ActivityObject> selectedData = getSelectedDateActivities(data, selectedDate);
 
               return SfCircularChart(
                 series: <DoughnutSeries<ActivityObject, String>>[
                   DoughnutSeries(
-                      dataSource: selectedData, xValueMapper: (ActivityObject object, int index) => object.category, yValueMapper: (ActivityObject object, int index) => -object.starttime.difference(object.endtime).inMinutes)
+                      dataSource: selectedData,
+                      xValueMapper: (ActivityObject object, int index) => object.category,
+                      yValueMapper: (ActivityObject object, int index) => -object.starttime.difference(object.endtime).inMinutes)
                 ],
               );
             });
@@ -89,20 +95,21 @@ class Diagram extends StatelessWidget {
 }
 
 class ActivityList extends StatelessWidget {
-  const ActivityList({Key? key}) : super(key: key);
+  ActivityList({Key? key}) : super(key: key);
 
+  final MainViewModel mainViewModel = MainViewModel();
+  
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<List<ActivityObject>>(
-      stream: Model().getStream(),
+      stream: mainViewModel.getActivities(),
       builder: (BuildContext context, AsyncSnapshot<List<ActivityObject>> snapshot) {
         List<ActivityObject> data = snapshot.data ?? [];
 
-        return StreamBuilder<int>(
-          stream: Model().getDayOffsetStream(),
-          builder: (BuildContext context, AsyncSnapshot<int> snapshot) {
-            int offset = snapshot.data ?? 0;
-            DateTime selectedDate = DateTime.now().add(Duration(days: offset));
+        return StreamBuilder<DateTime>(
+          stream: mainViewModel.getFocusDay(),
+          builder: (BuildContext context, AsyncSnapshot<DateTime> snapshot) {
+            DateTime selectedDate = snapshot.data ?? DateTime.now();
             List<ActivityObject> selectedData = getSelectedDateActivities(data, selectedDate);
 
             return ListView.builder(
@@ -117,16 +124,17 @@ class ActivityList extends StatelessWidget {
 }
 
 class ActivityListItem extends StatelessWidget {
-  final ActivityObject activity;
+  ActivityListItem({Key? key, required this.activity}) : super(key: key);
 
-  const ActivityListItem({Key? key, required this.activity}) : super(key: key);
+  final MainViewModel mainViewModel = MainViewModel();
+  final ActivityObject activity;
 
   @override
   Widget build(BuildContext context) {
     return Dismissible(
       key: ValueKey<ActivityObject>(activity),
       onDismissed: (DismissDirection direction) {
-        Model().removeActivity(activity);
+        mainViewModel.deleteActivity(activity);
       },
       confirmDismiss: (DismissDirection direction) {
         return showDialog<bool>(
@@ -147,7 +155,7 @@ class ActivityListItem extends StatelessWidget {
             width: 64,
             decoration: const BoxDecoration(shape: BoxShape.circle, color: Colors.red),
           ),
-          title: Text(activity.name ?? activity.category),
+          title: Text(activity.name == '' ? activity.category : activity.name),
           subtitle: Text(getTimeString(activity.starttime) + " - " + getTimeString(activity.endtime)),
         ),
       ),

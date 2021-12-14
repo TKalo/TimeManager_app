@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:time_manager/AddActivity.dart';
-import 'package:time_manager/Home.dart';
-import 'Routing.dart';
+import 'package:time_manager/Presentation/Home.dart';
+import 'package:time_manager/Processing/MainViewModel.dart';
+
+import 'AddActivity.dart';
+
 
 void main() {
   runApp(const MyApp());
@@ -18,10 +20,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: StreamBuilder<Widget>(
-        stream: getCurrentViewStream(),
-        builder: (context, AsyncSnapshot<Widget> snap) => snap.data ?? Container(),
-      ),
+      home: const Home(),
       routes: {
         routes.home.name: (context) => const Home(),
         routes.addActivity.name: (context) => AddActivity(),

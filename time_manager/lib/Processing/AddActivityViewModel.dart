@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:time_manager/Routing.dart';
-import 'ActivityObject.dart';
-import 'Model.dart';
+import 'package:time_manager/Processing/MainViewModel.dart';
+import 'package:time_manager/persistence/StorageHandler.dart';
+import '../persistence/ActivityObject.dart';
 import 'helpers.dart';
 
 class AddActivityViewModel {
@@ -11,9 +11,11 @@ class AddActivityViewModel {
 
   ActivityObject activity = ActivityObject(starttime: DateTime.now(), endtime: DateTime.now(), category: '');
 
+  MainViewModel mainViewModel = MainViewModel();
+  StorageHandler storage = StorageHandler();
+
   void setInterval(TimeOfDay starttime, TimeOfDay endtime) async {
-    int offset = await Model().getDayOffsetStream().first;
-    DateTime selectedDate = DateTime.now().add(Duration(days: offset));
+    DateTime selectedDate = await mainViewModel.getFocusDay().first;
 
     activity.starttime = DateTime(selectedDate.year, selectedDate.month, selectedDate.day, starttime.hour, starttime.minute);
 
@@ -30,7 +32,7 @@ class AddActivityViewModel {
   }
 
   void submitActivity(BuildContext context) async {
-    List<ActivityObject> allActivities = await Model().getStream().first;
+    List<ActivityObject> allActivities = await storage.getActivities().first;
 
     print(allActivities.map((e) => e.starttime.toString()));
 
@@ -41,7 +43,7 @@ class AddActivityViewModel {
     if (intersectingActivities.isNotEmpty) {
       requestIntersectingActivitiesResolution(context, intersectingActivities);
     } else {
-      Model().addActivity(activity);
+      storage.addActivity(activity);
       resetActivityObject();
       Navigator.pushNamed(context, routes.home.name);
     }
@@ -119,7 +121,7 @@ class AddActivityViewModel {
     print('croppedActivities: ' + croppedActivities.length.toString());
 
     for (ActivityObject croppedActivity in croppedActivities) {
-      Model().addActivity(croppedActivity);
+      storage.addActivity(croppedActivity);
     }
   }
 

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:time_manager/Processing/MainViewModel.dart';
-import 'package:time_manager/Processing/helpers.dart';
+import 'package:time_manager/helpers.dart';
 import 'package:time_manager/persistence/ActivityObject.dart';
 
 

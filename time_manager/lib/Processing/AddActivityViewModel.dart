@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:time_manager/Processing/MainViewModel.dart';
-import 'package:time_manager/persistence/StorageHandler.dart';
+import 'package:time_manager/persistence/DatabaseHandler.dart';
+import 'package:time_manager/persistence/Interfaces/IFrontendDatabase.dart';
 import '../persistence/ActivityObject.dart';
-import 'helpers.dart';
+import '../helpers.dart';
 
 class AddActivityViewModel {
   static final AddActivityViewModel _singleton = AddActivityViewModel._internal();
@@ -12,7 +13,7 @@ class AddActivityViewModel {
   ActivityObject activity = ActivityObject(starttime: DateTime.now(), endtime: DateTime.now(), category: '');
 
   MainViewModel mainViewModel = MainViewModel();
-  StorageHandler storage = StorageHandler();
+  IFrontendDatabase storage = DatabaseHandler();
 
   void setInterval(TimeOfDay starttime, TimeOfDay endtime) async {
     DateTime selectedDate = await mainViewModel.getFocusDay().first;

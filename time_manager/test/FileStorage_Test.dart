@@ -1,13 +1,19 @@
-import 'dart:math';
+import 'dart:io';
 
 import 'package:test/test.dart';
 import 'package:time_manager/persistence/ActivityObject.dart';
 import 'package:time_manager/persistence/FileStorage.dart';
 
 main() {
-  FileStorage storage = FileStorage()..setDebug();
+  FileStorage storage = FileStorage(debug: true);
 
   group('CRUD', () {
+    setUp(() async {
+      Stream<List<ActivityObject>> activities = await storage.getActivities();
+
+      activities.listen((event) => print(event.toString()));
+    });
+
     test('Check clean database', () async {
       List<ActivityObject> activities = await storage.getActivities().first;
       expect(activities.length, 0);
@@ -18,7 +24,8 @@ main() {
       DateTime endTime = DateTime(2002, 02, 02, 02, 02);
       String category = 'category';
       ActivityObject activity = ActivityObject(starttime: startTime, endtime: endTime, category: category);
-      storage.addActivity(activity);
+      await storage.addActivity(activity);
+
       List<ActivityObject> activities = await storage.getActivities().first;
 
       expect(activities.length, 1);

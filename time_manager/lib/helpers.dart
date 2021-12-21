@@ -10,3 +10,8 @@ List<ActivityObject> getSelectedDateActivities(List<ActivityObject> existingActi
       return cleanDate1.isAtSameMomentAs(cleanDate2);
     }).toList();
   }
+  
+T notNullOrFail<T>(T? object) {
+  if (object == null) NullThrownError();
+  return object as T;
+}

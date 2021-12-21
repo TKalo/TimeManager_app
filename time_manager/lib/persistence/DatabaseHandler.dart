@@ -9,8 +9,8 @@ import '../helpers.dart';
 import 'ActivityObject.dart';
 
 class DatabaseHandler implements IFrontendDatabase {
-  static final DatabaseHandler _singleton = DatabaseHandler._internal();
-  factory DatabaseHandler() => _singleton;
+  static const DatabaseHandler? _singleton = null;
+  factory DatabaseHandler({bool debug = false}) => _singleton ?? DatabaseHandler._internal(debug: debug);
   DatabaseHandler._internal({this.debug = false}) : storage = FileDatabase(debug: debug);
 
   final _lock = Lock();
@@ -19,9 +19,9 @@ class DatabaseHandler implements IFrontendDatabase {
   final IBackendDatabase storage;
 
   @override
-  Future<DatabaseResponseObject<void>> addActivity(ActivityObject activity) {
-    return _lock.synchronized<DatabaseResponseObject<void>>(() {
-      _updateStream();
+  Future<DatabaseResponseObject<int>> addActivity(ActivityObject activity) {
+    return _lock.synchronized<DatabaseResponseObject<int>>(() {
+      updateStream();
       return storage.addActivity(activity);
     });
   }
@@ -29,7 +29,7 @@ class DatabaseHandler implements IFrontendDatabase {
   @override
   Future<DatabaseResponseObject<void>> updateActivity(ActivityObject activity) {
     return _lock.synchronized<DatabaseResponseObject<void>>(() {
-      _updateStream();
+      updateStream();
       return storage.updateActivity(activity);
     });
   }
@@ -37,7 +37,7 @@ class DatabaseHandler implements IFrontendDatabase {
   @override
   Future<DatabaseResponseObject<void>> deleteActivity(ActivityObject activity) {
     return _lock.synchronized<DatabaseResponseObject<void>>(() {
-      _updateStream();
+      updateStream();
       return storage.deleteActivity(activity);
     });
   }
@@ -45,10 +45,11 @@ class DatabaseHandler implements IFrontendDatabase {
   @override
   Stream<List<ActivityObject>> getActivities() => _data.stream;
 
-  void _updateStream() {
-    _lock.synchronized(() async {
+  Future<void> updateStream() {
+    return _lock.synchronized<void>(() async {
       DatabaseResponseObject<List<ActivityObject>> response = await storage.getActivities();
       if (response.success) _data.add(notNullOrFail<List<ActivityObject>>(response.result));
+      return;
     });
   }
 }

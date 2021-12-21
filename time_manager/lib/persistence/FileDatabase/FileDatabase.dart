@@ -21,7 +21,7 @@ class FileDatabase implements IBackendDatabase {
   FileDatabase({required this.debug}) : con = debug ? FileConnection(filename: 'database') : FileConnection(filename: 'test');
 
   @override
-  Future<DatabaseResponseObject<void>> addActivity(ActivityObject activity) async {
+  Future<DatabaseResponseObject<int>> addActivity(ActivityObject activity) async {
     try {
       //get existing activies
       List<ActivityObject> activities = notNullOrFail((await getActivities()).result);
@@ -35,7 +35,7 @@ class FileDatabase implements IBackendDatabase {
       //persist new activity list
       await con.overwriteDatabase(activityObjectsToJson(activities));
 
-      return DatabaseResponseObject<void>.success();
+      return DatabaseResponseObject<int>.success(result: activity.id);
     } catch (e) {
       return DatabaseResponseObject.error(error: e.toString());
     }
@@ -94,7 +94,7 @@ class FileDatabase implements IBackendDatabase {
   int getUnusedId(List<ActivityObject> activities) {
     int id = 0;
 
-    for (id; id < 10000; id++) if (activities.any((activity) => activity.id == id)) break;
+    for (id; id < 10000; id++) if (!activities.any((activity) => activity.id == id)) break;
 
     return id;
   }

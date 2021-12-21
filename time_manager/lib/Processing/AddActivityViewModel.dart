@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:time_manager/Processing/MainViewModel.dart';
 import 'package:time_manager/persistence/DatabaseHandler.dart';
 import 'package:time_manager/persistence/Interfaces/IFrontendDatabase.dart';
-import '../persistence/ActivityObject.dart';
+import '../persistence/Objects/ActivityObject.dart';
 import '../helpers.dart';
 
 class AddActivityViewModel {

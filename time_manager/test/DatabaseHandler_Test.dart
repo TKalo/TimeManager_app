@@ -2,7 +2,7 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:time_manager/helpers.dart';
-import 'package:time_manager/persistence/ActivityObject.dart';
+import 'package:time_manager/persistence/Objects/ActivityObject.dart';
 import 'package:time_manager/persistence/DatabaseHandler.dart';
 
 main() {

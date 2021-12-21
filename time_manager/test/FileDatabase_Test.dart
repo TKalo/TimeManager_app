@@ -3,8 +3,8 @@ import 'dart:async';
 import 'package:rxdart/rxdart.dart';
 import 'package:test/test.dart';
 import 'package:time_manager/helpers.dart';
-import 'package:time_manager/persistence/ActivityObject.dart';
-import 'package:time_manager/persistence/DatabaseResponseObject.dart';
+import 'package:time_manager/persistence/Objects/ActivityObject.dart';
+import 'package:time_manager/persistence/Objects/DatabaseResponseObject.dart';
 import 'package:time_manager/persistence/FileDatabase/FileDatabase.dart';
 
 main() {

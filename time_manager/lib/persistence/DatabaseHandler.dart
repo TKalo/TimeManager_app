@@ -1,12 +1,12 @@
 import 'package:rxdart/rxdart.dart';
 import 'package:synchronized/synchronized.dart';
-import 'package:time_manager/persistence/DatabaseResponseObject.dart';
+import 'package:time_manager/persistence/Objects/DatabaseResponseObject.dart';
 import 'package:time_manager/persistence/FileDatabase/FileDatabase.dart';
 import 'package:time_manager/persistence/Interfaces/IBackendDatabase.dart';
 import 'package:time_manager/persistence/Interfaces/IFrontendDatabase.dart';
 
 import '../helpers.dart';
-import 'ActivityObject.dart';
+import 'Objects/ActivityObject.dart';
 
 class DatabaseHandler implements IFrontendDatabase {
   static const DatabaseHandler? _singleton = null;

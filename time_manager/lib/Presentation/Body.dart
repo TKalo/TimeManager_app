@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:time_manager/Processing/MainViewModel.dart';
 import 'package:time_manager/helpers.dart';
-import 'package:time_manager/persistence/ActivityObject.dart';
+import 'package:time_manager/persistence/Objects/ActivityObject.dart';
 
 
 class Body extends StatelessWidget {

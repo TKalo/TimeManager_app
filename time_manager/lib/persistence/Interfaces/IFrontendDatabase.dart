@@ -1,4 +1,4 @@
-import 'package:time_manager/persistence/ActivityObject.dart';
+import 'package:time_manager/persistence/Objects/ActivityObject.dart';
 import 'package:time_manager/persistence/Interfaces/IDatabase.dart';
 
 abstract class IFrontendDatabase implements IDatabase {

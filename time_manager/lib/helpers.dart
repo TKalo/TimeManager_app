@@ -1,4 +1,4 @@
-import 'package:time_manager/persistence/ActivityObject.dart';
+import 'package:time_manager/persistence/Objects/ActivityObject.dart';
 
 String getTimeString(DateTime dateTime) =>
     dateTime.hour.toString().padLeft(2,'0') + ":" + dateTime.minute.toString().padLeft(2,'0');

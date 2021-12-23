@@ -11,7 +11,9 @@ import 'Objects/ActivityObject.dart';
 class DatabaseHandler implements IFrontendDatabase {
   static const DatabaseHandler? _singleton = null;
   factory DatabaseHandler({bool debug = false}) => _singleton ?? DatabaseHandler._internal(debug: debug);
-  DatabaseHandler._internal({this.debug = false}) : storage = FileDatabase(debug: debug);
+  DatabaseHandler._internal({this.debug = false}) : storage = FileDatabase(debug: debug) {
+    updateStream();
+  }
 
   final _lock = Lock();
   final BehaviorSubject<List<ActivityObject>> _data = BehaviorSubject.seeded([]);

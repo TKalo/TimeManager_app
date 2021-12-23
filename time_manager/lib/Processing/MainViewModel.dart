@@ -3,6 +3,7 @@ import 'package:time_manager/persistence/Objects/ActivityObject.dart';
 import 'package:time_manager/persistence/DatabaseHandler.dart';
 import 'package:time_manager/persistence/Interfaces/IFrontendDatabase.dart';
 
+
 enum routes { home, addActivity }
 
 class MainViewModel {
@@ -13,8 +14,8 @@ class MainViewModel {
   final BehaviorSubject<DateTime> _focusDay = BehaviorSubject.seeded(DateTime.now());
   Stream<DateTime> getFocusDay() => _focusDay.stream;
   void setFocusDay(DateTime dateTime) => _focusDay.add(dateTime);
-  void increaseFocusDay() async => (await _focusDay.first).add(const Duration(days: 1));
-  void decreaseFocusDay() async => (await _focusDay.first).subtract(const Duration(days: 1));
+  void increaseFocusDay() async => _focusDay.add((await _focusDay.first).add(const Duration(days: 1)));
+  void decreaseFocusDay() async => _focusDay.add((await _focusDay.first).subtract(const Duration(days: 1)));
 
   IFrontendDatabase storage = DatabaseHandler();
 

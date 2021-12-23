@@ -18,4 +18,6 @@ class ActivityObject {
         category = map['category'] ?? '',
         name = map['name'] ?? '',
         description = map['description'] ?? '';
+  
+  ActivityObject copy() => ActivityObject(starttime: starttime, endtime: endtime, category: category, name: name, description: description);
 }

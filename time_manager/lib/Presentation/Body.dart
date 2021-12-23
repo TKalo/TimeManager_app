@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:syncfusion_flutter_charts/charts.dart';
+import 'package:intl/intl.dart';
+import 'package:time_manager/Presentation/Diagram.dart';
 import 'package:time_manager/Processing/MainViewModel.dart';
 import 'package:time_manager/helpers.dart';
 import 'package:time_manager/persistence/Objects/ActivityObject.dart';
-
 
 class Body extends StatelessWidget {
   const Body({Key? key}) : super(key: key);
@@ -25,71 +25,49 @@ class Head extends StatelessWidget {
   Head({Key? key}) : super(key: key);
 
   final MainViewModel mainViewModel = MainViewModel();
+  final DateFormat formatter = DateFormat('dd/MM/yyyy');
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      child: Container(
-        height: 260,
-        padding: const EdgeInsets.all(16),
-        decoration: const BoxDecoration(color: Colors.blue, boxShadow: [BoxShadow(color: Color(0xffd9d9d9), spreadRadius: 0, blurRadius: 8, offset: Offset(0, 7))]),
-        child: Row(
-          crossAxisAlignment: CrossAxisAlignment.center,
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            IconButton(
-              onPressed: () async => mainViewModel.decreaseFocusDay(),
-              icon: const Icon(
-                Icons.arrow_back,
-                color: Colors.white,
-              ),
+    return Container(
+      height: 260,
+      padding: const EdgeInsets.all(16),
+      decoration: const BoxDecoration(color: Colors.blue, boxShadow: [BoxShadow(color: Color(0xffd9d9d9), spreadRadius: 0, blurRadius: 8, offset: Offset(0, 7))]),
+      child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
+        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+        children: [
+          IconButton(
+            onPressed: () => mainViewModel.decreaseFocusDay(),
+            icon: const Icon(
+              Icons.arrow_back,
+              color: Colors.white,
             ),
-            Expanded(child: Diagram()),
-            IconButton(
-              onPressed: () async => mainViewModel.increaseFocusDay(),
-              icon: const Icon(
-                Icons.arrow_forward,
-                color: Colors.white,
-              ),
-            )
-          ],
-        ),
+          ),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Expanded(child: Diagram()),
+                Center(
+                  child: StreamBuilder<DateTime>(
+                    stream: mainViewModel.getFocusDay(), 
+                    builder: (context, snapshot) => Text(formatter.format(snapshot.data ?? DateTime.now()))
+                  ),
+                )
+              ],
+            ),
+          ),
+          IconButton(
+            onPressed: () => mainViewModel.increaseFocusDay(),
+            icon: const Icon(
+              Icons.arrow_forward,
+              color: Colors.white,
+            ),
+          )
+        ],
       ),
-      onHorizontalDragEnd: (DragEndDetails details) {},
-      onHorizontalDragStart: (DragStartDetails details) {},
-    );
-  }
-}
-
-class Diagram extends StatelessWidget {
-  Diagram({Key? key}) : super(key: key);
-
-  final MainViewModel mainViewModel = MainViewModel();
-
-  @override
-  Widget build(BuildContext context) {
-    return StreamBuilder<List<ActivityObject>>(
-      stream: mainViewModel.getActivities(),
-      builder: (BuildContext context, AsyncSnapshot<List<ActivityObject>> snapshot) {
-        List<ActivityObject> data = snapshot.data ?? [];
-        data.sort((a, b) => a.starttime.compareTo(b.starttime));
-
-        return StreamBuilder<DateTime>(
-            stream: mainViewModel.getFocusDay(),
-            builder: (context, snapshot) {
-              DateTime selectedDate = snapshot.data ?? DateTime.now();
-              List<ActivityObject> selectedData = getSelectedDateActivities(data, selectedDate);
-
-              return SfCircularChart(
-                series: <DoughnutSeries<ActivityObject, String>>[
-                  DoughnutSeries(
-                      dataSource: selectedData,
-                      xValueMapper: (ActivityObject object, int index) => object.category,
-                      yValueMapper: (ActivityObject object, int index) => -object.starttime.difference(object.endtime).inMinutes)
-                ],
-              );
-            });
-      },
     );
   }
 }
@@ -98,7 +76,7 @@ class ActivityList extends StatelessWidget {
   ActivityList({Key? key}) : super(key: key);
 
   final MainViewModel mainViewModel = MainViewModel();
-  
+
   @override
   Widget build(BuildContext context) {
     return StreamBuilder<List<ActivityObject>>(

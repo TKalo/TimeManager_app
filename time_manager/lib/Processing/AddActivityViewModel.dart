@@ -17,6 +17,7 @@ class AddActivityViewModel {
 
   IFrontendDatabase storage = DatabaseHandler();
 
+
   void setInterval(TimeOfDay starttime, TimeOfDay endtime) async {
     DateTime selectedDate = await mainViewModel.getFocusDay().first;
 
@@ -25,7 +26,7 @@ class AddActivityViewModel {
     activity.endtime = DateTime(selectedDate.year, selectedDate.month, selectedDate.day, endtime.hour, endtime.minute);
   }
 
-
+  
   void submitActivity(BuildContext context) async {
     
     List<ActivityObject> allActivities = await storage.getActivities().first;
@@ -36,13 +37,13 @@ class AddActivityViewModel {
 
     if (intersectingActivities.isNotEmpty) {
 
-      requestIntersectingActivitiesResolution(context, intersectingActivities);
+      _requestIntersectingActivitiesResolution(context, intersectingActivities);
 
     } else {
 
       storage.addActivity(activity);
 
-      resetActivityObject();
+      _resetActivityObject();
 
       Navigator.pushNamed(context, routes.home.name);
 
@@ -50,7 +51,8 @@ class AddActivityViewModel {
 
   }
 
-  void requestIntersectingActivitiesResolution(BuildContext context, List<ActivityObject> intersectingActivities) {
+
+  void _requestIntersectingActivitiesResolution(BuildContext context, List<ActivityObject> intersectingActivities) {
     showDialog(
       context: context,
       builder: (BuildContext context) {
@@ -61,14 +63,14 @@ class AddActivityViewModel {
                 onPressed: () {
                   ActivityManipulation.cropSingleActivity(intersectingActivities, activity);
                   Navigator.pushNamed(context, routes.home.name);
-                  resetActivityObject();
+                  _resetActivityObject();
                 },
                 child: const Text('crop this activity')),
             TextButton(
                 onPressed: () {
                   ActivityManipulation.cropOtherActivities(intersectingActivities, activity);
                   Navigator.pushNamed(context, routes.home.name);
-                  resetActivityObject();
+                  _resetActivityObject();
                 },
                 child: const Text('crop other activities')),
             TextButton(onPressed: () => Navigator.pop(context), child: const Text('cancel'))
@@ -78,9 +80,9 @@ class AddActivityViewModel {
     );
   }
 
-  void resetActivityObject() {
+  void _resetActivityObject() {
 
     activity = ActivityObject(starttime: DateTime.now(), endtime: DateTime.now(), category: '');
-    
+
   }
 }

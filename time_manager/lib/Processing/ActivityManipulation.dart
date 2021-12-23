@@ -4,44 +4,47 @@ class ActivityManipulation {
   ///Crops [activity] in relation to [activities] and returns list of cropped activities
   static List<ActivityObject> cropSingleActivity(List<ActivityObject> activities, activity) {
     //SORT OBJECTS BY DATETIME
-    activities.sort((o1, o2) => o1.starttime.compareTo(o2.starttime));
 
     List<ActivityObject> croppedList = [activity];
 
     for (ActivityObject existingActivity in activities) {
-      for (ActivityObject tempActivity in croppedList) {
-        croppedList.remove(tempActivity);
-        croppedList.addAll(cropActivity(existingActivity, activity));
-      }
+      List<ActivityObject> tempList = [];
+      
+      croppedList.forEach((element) => tempList.addAll(_cropActivity(activity, existingActivity)));
+    
+      croppedList = tempList;
     }
 
-    return croppedList;
+    return croppedList..sort((a, b) => a.starttime.compareTo(b.starttime));
   }
 
   ///Crops activities in [activities] in relation to [activity] and returns list of cropped activities
   static List<ActivityObject> cropOtherActivities(List<ActivityObject> activities, ActivityObject activity) {
-    List<ActivityObject> newList = [activity];
+    List<ActivityObject> croppedList = [];
 
-    activities.forEach((existingActivity) => newList.addAll(cropActivity(existingActivity, activity)));
+    activities.forEach((existingActivity) => croppedList.addAll(_cropActivity(existingActivity, activity)));
 
-    return newList;
+    return croppedList..sort((a, b) => a.starttime.compareTo(b.starttime));
   }
 
   ///Crops [toCrop] in relation to [notToCrop] and returns list of cropped activities
-  static List<ActivityObject> cropActivity(ActivityObject toCrop, ActivityObject notToCrop) {
+  static List<ActivityObject> _cropActivity(ActivityObject toCrop, ActivityObject notToCrop) {
     //toCrop is inside notToCrop and is removed completely
-    if (toCrop.starttime.isAfter(notToCrop.starttime) && toCrop.endtime.isBefore(notToCrop.endtime)) return [];
+    if ((toCrop.starttime.isAfter(notToCrop.starttime) || toCrop.starttime.isAtSameMomentAs(notToCrop.starttime)) &&
+        (toCrop.endtime.isBefore(notToCrop.endtime) || toCrop.endtime.isAtSameMomentAs(notToCrop.endtime))) return [];
 
     //to notToCrop is inside toCrop, an toCrop is split in two
     if (toCrop.starttime.isBefore(notToCrop.starttime) && toCrop.endtime.isAfter(notToCrop.endtime)) {
-      return [toCrop.copy()..starttime = notToCrop.endtime, toCrop.copy()..endtime = notToCrop.starttime];
+      return [toCrop.copy()..endtime = notToCrop.starttime, toCrop.copy()..starttime = notToCrop.endtime];
     }
 
     //to crop starttime is inside notToCrop: toCrop starttime is cropped to notToCrop endtime
-    if (toCrop.starttime.isAfter(notToCrop.starttime) && toCrop.starttime.isBefore(notToCrop.endtime)) return [toCrop.copy()..starttime = notToCrop.endtime];
+    if ((toCrop.starttime.isAfter(notToCrop.starttime) || toCrop.starttime.isAtSameMomentAs(notToCrop.starttime)) && toCrop.starttime.isBefore(notToCrop.endtime))
+      return [toCrop.copy()..starttime = notToCrop.endtime];
 
     //to crop endtime is inside notToCrop: toCrop endtime is cropped to notToCrop starttime
-    if (toCrop.endtime.isBefore(notToCrop.endtime) && toCrop.endtime.isAfter(notToCrop.starttime)) return [toCrop.copy()..endtime = notToCrop.starttime];
+    if ((toCrop.endtime.isBefore(notToCrop.endtime) || toCrop.endtime.isAtSameMomentAs(notToCrop.endtime)) && toCrop.endtime.isAfter(notToCrop.starttime))
+      return [toCrop.copy()..endtime = notToCrop.starttime];
 
     //There is no overlap and toCrop is returned
     return [toCrop];

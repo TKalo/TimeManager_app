@@ -1,7 +1,6 @@
 import 'package:rxdart/rxdart.dart';
 import 'package:time_manager/persistence/Objects/ActivityObject.dart';
 import 'package:time_manager/persistence/DatabaseHandler.dart';
-import 'package:time_manager/persistence/Interfaces/IFrontendDatabase.dart';
 
 
 enum routes { home, addActivity }
@@ -17,8 +16,6 @@ class MainViewModel {
   void increaseFocusDay() async => _focusDay.add((await _focusDay.first).add(const Duration(days: 1)));
   void decreaseFocusDay() async => _focusDay.add((await _focusDay.first).subtract(const Duration(days: 1)));
 
-  IFrontendDatabase storage = DatabaseHandler();
-
-  Stream<List<ActivityObject>> getActivities() => storage.getActivities();
-  void deleteActivity(ActivityObject activity) => storage.deleteActivity(activity);
+  Stream<List<ActivityObject>> getActivities() => DatabaseHandler().getActivities();
+  void deleteActivity(ActivityObject activity) => DatabaseHandler().deleteActivity(activity);
 }

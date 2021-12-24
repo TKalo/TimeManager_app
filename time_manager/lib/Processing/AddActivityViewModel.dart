@@ -3,7 +3,6 @@ import 'package:time_manager/Processing/MainViewModel.dart';
 import 'package:time_manager/persistence/DatabaseHandler.dart';
 import 'package:time_manager/persistence/Interfaces/IFrontendDatabase.dart';
 import '../persistence/Objects/ActivityObject.dart';
-import '../helpers.dart';
 import 'ActivityManipulation.dart';
 
 class AddActivityViewModel {
@@ -31,9 +30,9 @@ class AddActivityViewModel {
     
     List<ActivityObject> allActivities = await storage.getActivities().first;
 
-    List<ActivityObject> selectedDateActivities = getSelectedDateActivities(allActivities, activity.starttime);
+    List<ActivityObject> selectedDateActivities = getActivitiesOfDay(allActivities, activity.starttime);
    
-    List<ActivityObject> intersectingActivities = ActivityManipulation.getIntersectingActivities(selectedDateActivities, activity);
+    List<ActivityObject> intersectingActivities = getIntersectingActivities(selectedDateActivities, activity);
 
     if (intersectingActivities.isNotEmpty) {
 
@@ -61,14 +60,14 @@ class AddActivityViewModel {
           actions: [
             TextButton(
                 onPressed: () {
-                  ActivityManipulation.cropSingleActivity(intersectingActivities, activity);
+                  cropSingleActivity(intersectingActivities, activity);
                   Navigator.pushNamed(context, routes.home.name);
                   _resetActivityObject();
                 },
                 child: const Text('crop this activity')),
             TextButton(
                 onPressed: () {
-                  ActivityManipulation.cropOtherActivities(intersectingActivities, activity);
+                  cropOtherActivities(intersectingActivities, activity);
                   Navigator.pushNamed(context, routes.home.name);
                   _resetActivityObject();
                 },

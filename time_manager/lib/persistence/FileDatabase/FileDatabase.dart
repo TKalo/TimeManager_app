@@ -17,7 +17,7 @@ class FileDatabase implements IBackendDatabase {
         _categoryDB = CategoryDatabase(connection: debug ? FileConnection(filename: 'categories_test') : FileConnection(filename: 'categories'));
 
   @override
-  Future<DatabaseResponseObject<int>> addCategory(CategoryObject category) => _categoryDB.addCategory(category);
+  Future<DatabaseResponseObject<void>> addCategory(CategoryObject category) => _categoryDB.addCategory(category);
 
   @override
   Future<DatabaseResponseObject<void>> deleteCategory(CategoryObject category) => _categoryDB.deletecategory(category);

@@ -11,7 +11,7 @@ abstract class IDatabase {
 
   dynamic getActivities();
 
-  Future<DatabaseResponseObject<int>> addCategory(CategoryObject object);
+  Future<DatabaseResponseObject<void>> addCategory(CategoryObject object);
 
   Future<DatabaseResponseObject<void>> updateCategory(CategoryObject object);
 

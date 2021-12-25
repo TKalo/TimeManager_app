@@ -72,8 +72,8 @@ class DatabaseHandler implements IFrontendDatabase {
   }
 
   @override
-  Future<DatabaseResponseObject<int>> addCategory(CategoryObject category) {
-    return _categoryLock.synchronized<DatabaseResponseObject<int>>(() {
+  Future<DatabaseResponseObject<void>> addCategory(CategoryObject category) {
+    return _categoryLock.synchronized<DatabaseResponseObject<void>>(() {
       updateCategoryStream();
       return storage.addCategory(category);
     });

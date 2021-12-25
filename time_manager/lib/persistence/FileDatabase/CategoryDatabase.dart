@@ -11,13 +11,13 @@ class CategoryDatabase {
 
   CategoryDatabase({required this.connection});
 
-  Future<DatabaseResponseObject<int>> addCategory(CategoryObject category) async {
+  Future<DatabaseResponseObject<void>> addCategory(CategoryObject category) async {
     try {
       //get existing activies
       List<CategoryObject> categories = notNullOrFail((await getcategories()).result);
 
-      //set unused id
-      category.id = getUnusedId(categories);
+      //Check name not in use
+      if (categories.any((existingCategory) => existingCategory.name == category.name)) throw Exception('name is already in use');
 
       //add new category
       categories.add(category);
@@ -25,7 +25,7 @@ class CategoryDatabase {
       //persist new category list
       await connection.overwriteDatabase(categoryToJson(categories));
 
-      return DatabaseResponseObject<int>.success(result: category.id);
+      return DatabaseResponseObject<int>.success();
     } catch (e) {
       return DatabaseResponseObject.error(error: e.toString());
     }
@@ -37,7 +37,7 @@ class CategoryDatabase {
       List<CategoryObject> categories = notNullOrFail((await getcategories()).result);
 
       //remove old version of category and add new version
-      categories.removeWhere((existingcategory) => existingcategory.id == category.id);
+      categories.removeWhere((existingcategory) => existingcategory.name == category.name);
       categories.add(category);
 
       //persist new category list
@@ -55,7 +55,7 @@ class CategoryDatabase {
       List<CategoryObject> categories = notNullOrFail((await getcategories()).result);
 
       //add new category
-      categories.removeWhere((existingcategory) => existingcategory.id == category.id);
+      categories.removeWhere((existingcategory) => existingcategory.name == category.name);
 
       //persist new category list
       await connection.overwriteDatabase(categoryToJson(categories));
@@ -65,7 +65,6 @@ class CategoryDatabase {
       return DatabaseResponseObject.error(error: e.toString());
     }
   }
-
 
   Future<DatabaseResponseObject<List<CategoryObject>>> getcategories() async {
     try {
@@ -77,14 +76,6 @@ class CategoryDatabase {
     } catch (e) {
       return DatabaseResponseObject.error(error: e.toString());
     }
-  }
-
-  int getUnusedId(List<CategoryObject> categories) {
-    int id = 0;
-
-    for (id; id < 10000; id++) if (!categories.any((category) => category.id == id)) break;
-
-    return id;
   }
 }
 

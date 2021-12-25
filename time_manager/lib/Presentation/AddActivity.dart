@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:time_manager/Processing/AddActivityViewModel.dart';
 import 'package:time_range_picker/time_range_picker.dart';
+import 'package:time_manager/Processing/MainViewModel.dart';
 
 class AddActivity extends StatelessWidget {
   AddActivity({Key? key}) : super(key: key);
@@ -26,10 +27,20 @@ class AddActivity extends StatelessWidget {
             runSpacing: 32,
             direction: Axis.horizontal,
             children: [
-              DropdownButtonFormField<String>(
-                onChanged: (item) => viewModel.activity.category = item ?? '',
-                items: types.map((e) => DropdownMenuItem(child: Text(e),value: e,)).toList(),
-                decoration: const InputDecoration(labelText: 'Activity Category *', border: OutlineInputBorder()),
+              Row(
+                children: [
+                  Expanded(
+                    child: DropdownButtonFormField<String>(
+                      onChanged: (item) => viewModel.activity.category = item ?? '',
+                      items: types.map((e) => DropdownMenuItem(child: Text(e),value: e,)).toList(),
+                      decoration: const InputDecoration(labelText: 'Activity Category *', border: OutlineInputBorder()),
+                    ),
+                  ),
+                  IconButton(
+                    onPressed: () => Navigator.pushNamed(context, routes.categoryList.name),
+                    icon: const Icon(Icons.edit)
+                  )
+                ],
               ),
 
               TextFormField(

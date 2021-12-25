@@ -4,7 +4,7 @@ import 'package:time_manager/persistence/DatabaseHandler.dart';
 import 'package:time_manager/persistence/Objects/CategoryObject.dart';
 
 
-enum routes { home, addActivity }
+enum routes { home, addActivity, categoryList, addCategory}
 
 class MainViewModel {
   static final MainViewModel _singleton = MainViewModel._internal();

@@ -1,25 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-import 'package:time_manager/Presentation/Diagram.dart';
-import 'package:time_manager/Processing/MainViewModel.dart';
 
-import 'ActivityList.dart';
-
-class Body extends StatelessWidget {
-  const Body({Key? key}) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Head(),
-        Expanded(
-          child: ActivityList(),
-        )
-      ],
-    );
-  }
-}
+import '../Processing/MainViewModel.dart';
+import 'Diagram.dart';
 
 class Head extends StatelessWidget {
   Head({Key? key}) : super(key: key);
@@ -49,7 +32,7 @@ class Head extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.stretch,
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Expanded(child: Diagram()),
+                const Expanded(child: Diagram()),
                 Center(
                   child: StreamBuilder<DateTime>(stream: mainViewModel.getFocusDay(), builder: (context, snapshot) => Text(formatter.format(snapshot.data ?? DateTime.now()))),
                 )

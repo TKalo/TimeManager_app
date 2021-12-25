@@ -8,7 +8,6 @@ import 'package:time_manager/persistence/DatabaseHandler.dart';
 main() {
   DatabaseHandler database = DatabaseHandler(debug: true);
   setUp(() async {
-    await database.updateStream();
     sleep(const Duration(seconds: 2));
     List<ActivityObject> activities = notNullOrFail(await database.getActivities().first);
     await Future.forEach(activities, (ActivityObject activity) async => await database.deleteActivity(activity));

@@ -9,14 +9,6 @@ import 'FileConnection.dart';
 class CategoryDatabase {
   final FileConnection connection;
 
-  String categoryToJson(List<CategoryObject> categories) {
-    return jsonEncode(categories.map((category) => category.toMap()).toList());
-  }
-
-  List<CategoryObject> jsonTocategories(String json) {
-    return json == '' ? [] : jsonDecode(json).map<CategoryObject>((e) => CategoryObject.fromJson(e)).toList();
-  }
-
   CategoryDatabase({required this.connection});
 
   Future<DatabaseResponseObject<int>> addCategory(CategoryObject category) async {
@@ -95,3 +87,7 @@ class CategoryDatabase {
     return id;
   }
 }
+
+String categoryToJson(List<CategoryObject> categories) => jsonEncode(categories.map((category) => category.toMap()).toList());
+
+List<CategoryObject> jsonTocategories(String json) => json == '' ? [] : jsonDecode(json).map<CategoryObject>((e) => CategoryObject.fromJson(e)).toList();

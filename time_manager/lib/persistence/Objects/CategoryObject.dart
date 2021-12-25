@@ -14,7 +14,7 @@ class CategoryObject {
   CategoryObject.fromJson(Map<String, dynamic> map)
       : id = int.parse(map['id'] ?? '-1'),
         name = map['name'] ?? '',
-        color = Color(map['color']);
+        color = Color(int.parse(map['color'], radix: 16));
   
   CategoryObject copy() => CategoryObject(id: id, name: name, color: color);
 }

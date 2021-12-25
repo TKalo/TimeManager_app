@@ -9,10 +9,6 @@ import 'FileConnection.dart';
 class ActivityDatabase {
   final FileConnection connection;
 
-  String activityObjectsToJson(List<ActivityObject> activities) => jsonEncode(activities.map((activity) => activity.toMap()).toList());
-
-  List<ActivityObject> jsonToActivities(String json) => json == '' ? [] : jsonDecode(json).map<ActivityObject>((e) => ActivityObject.fromJson(e)).toList();
-
   ActivityDatabase({required this.connection});
 
   Future<DatabaseResponseObject<int>> addActivity(ActivityObject activity) async {
@@ -27,7 +23,7 @@ class ActivityDatabase {
       activities.add(activity);
 
       //persist new activity list
-      await connection.overwriteDatabase(activityObjectsToJson(activities));
+      await connection.overwriteDatabase(activityToJson(activities));
 
       return DatabaseResponseObject<int>.success(result: activity.id);
     } catch (e) {
@@ -45,7 +41,7 @@ class ActivityDatabase {
       activities.add(activity);
 
       //persist new activity list
-      await connection.overwriteDatabase(activityObjectsToJson(activities));
+      await connection.overwriteDatabase(activityToJson(activities));
 
       return DatabaseResponseObject<void>.success();
     } catch (e) {
@@ -62,7 +58,7 @@ class ActivityDatabase {
       activities.removeWhere((existingActivity) => existingActivity.id == activity.id);
 
       //persist new activity list
-      await connection.overwriteDatabase(activityObjectsToJson(activities));
+      await connection.overwriteDatabase(activityToJson(activities));
 
       return DatabaseResponseObject<void>.success();
     } catch (e) {
@@ -92,3 +88,6 @@ class ActivityDatabase {
   }
 
 }
+
+String activityToJson(List<ActivityObject> activities) => jsonEncode(activities.map((activity) => activity.toMap()).toList());
+List<ActivityObject> jsonToActivities(String json) => json == '' ? [] : jsonDecode(json).map<ActivityObject>((e) => ActivityObject.fromJson(e)).toList();

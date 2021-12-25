@@ -38,5 +38,5 @@ class FileDatabase implements IBackendDatabase {
   Future<DatabaseResponseObject<List<ActivityObject>>> getActivities() => _activityDB.getActivities();
 
   @override
-  Future<DatabaseResponseObject<void>> updateActivity(ActivityObject activity) => _activityDB.deleteActivity(activity);
+  Future<DatabaseResponseObject<void>> updateActivity(ActivityObject activity) => _activityDB.updateActivity(activity);
 }

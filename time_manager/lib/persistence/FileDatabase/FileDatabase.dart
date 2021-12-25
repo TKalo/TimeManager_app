@@ -1,101 +1,42 @@
-import 'dart:convert';
+import 'package:time_manager/persistence/FileDatabase/ActivityDatabase.dart';
+import 'package:time_manager/persistence/FileDatabase/CategoryDatabase.dart';
+import 'package:time_manager/persistence/Objects/CategoryObject.dart';
 import 'package:time_manager/persistence/Objects/ActivityObject.dart';
 import 'package:time_manager/persistence/Objects/DatabaseResponseObject.dart';
 import 'package:time_manager/persistence/Interfaces/IBackendDatabase.dart';
 
-import '../../helpers.dart';
 import 'FileConnection.dart';
 
 class FileDatabase implements IBackendDatabase {
   final bool debug;
-  final FileConnection con;
+  final ActivityDatabase _activityDB;
+  final CategoryDatabase _categoryDB;
 
-  String activityObjectsToJson(List<ActivityObject> activities) {
-    return jsonEncode(activities.map((activity) => activity.toMap()).toList());
-  }
-
-  List<ActivityObject> jsonToActivities(String json) {
-    return json == '' ? [] : jsonDecode(json).map<ActivityObject>((e) => ActivityObject.fromJson(e)).toList();
-  }
-
-  FileDatabase({required this.debug}) : con = debug ? FileConnection(filename: 'database') : FileConnection(filename: 'test');
+  FileDatabase({required this.debug})
+      : _activityDB = ActivityDatabase(connection: debug ? FileConnection(filename: 'activities_test') : FileConnection(filename: 'activities')),
+        _categoryDB = CategoryDatabase(connection: debug ? FileConnection(filename: 'categories_test') : FileConnection(filename: 'categories'));
 
   @override
-  Future<DatabaseResponseObject<int>> addActivity(ActivityObject activity) async {
-    try {
-      //get existing activies
-      List<ActivityObject> activities = notNullOrFail((await getActivities()).result);
-
-      //set unused id
-      activity.id = getUnusedId(activities);
-
-      //add new activity
-      activities.add(activity);
-
-      //persist new activity list
-      await con.overwriteDatabase(activityObjectsToJson(activities));
-
-      return DatabaseResponseObject<int>.success(result: activity.id);
-    } catch (e) {
-      return DatabaseResponseObject.error(error: e.toString());
-    }
-  }
+  Future<DatabaseResponseObject<int>> addCategory(CategoryObject category) => _categoryDB.addCategory(category);
 
   @override
-  Future<DatabaseResponseObject> updateActivity(ActivityObject activity) async {
-    try {
-      //get existing activies
-      List<ActivityObject> activities = notNullOrFail((await getActivities()).result);
-
-      //remove old version of activity and add new version
-      activities.removeWhere((existingActivity) => existingActivity.id == activity.id);
-      activities.add(activity);
-
-      //persist new activity list
-      await con.overwriteDatabase(activityObjectsToJson(activities));
-
-      return DatabaseResponseObject<void>.success();
-    } catch (e) {
-      return DatabaseResponseObject.error(error: e.toString());
-    }
-  }
+  Future<DatabaseResponseObject<void>> deleteCategory(CategoryObject category) => _categoryDB.deletecategory(category);
 
   @override
-  Future<DatabaseResponseObject> deleteActivity(ActivityObject activity) async {
-    try {
-      //get existing activies
-      List<ActivityObject> activities = notNullOrFail((await getActivities()).result);
-
-      //add new activity
-      activities.removeWhere((existingActivity) => existingActivity.id == activity.id);
-
-      //persist new activity list
-      await con.overwriteDatabase(activityObjectsToJson(activities));
-
-      return DatabaseResponseObject<void>.success();
-    } catch (e) {
-      return DatabaseResponseObject.error(error: e.toString());
-    }
-  }
+  Future<DatabaseResponseObject<List<CategoryObject>>> getCategories() => _categoryDB.getcategories();
 
   @override
-  Future<DatabaseResponseObject<List<ActivityObject>>> getActivities() async {
-    try {
-      String json = await con.loadDatabase();
+  Future<DatabaseResponseObject<void>> updateCategory(CategoryObject category) => _categoryDB.updatecategory(category);
 
-      List<ActivityObject> activities = jsonToActivities(json);
+  @override
+  Future<DatabaseResponseObject<int>> addActivity(ActivityObject activity) => _activityDB.addActivity(activity);
 
-      return DatabaseResponseObject.success(result: activities);
-    } catch (e) {
-      return DatabaseResponseObject.error(error: e.toString());
-    }
-  }
+  @override
+  Future<DatabaseResponseObject<void>> deleteActivity(ActivityObject activity) => _activityDB.deleteActivity(activity);
 
-  int getUnusedId(List<ActivityObject> activities) {
-    int id = 0;
+  @override
+  Future<DatabaseResponseObject<List<ActivityObject>>> getActivities() => _activityDB.getActivities();
 
-    for (id; id < 10000; id++) if (!activities.any((activity) => activity.id == id)) break;
-
-    return id;
-  }
+  @override
+  Future<DatabaseResponseObject<void>> updateActivity(ActivityObject activity) => _activityDB.deleteActivity(activity);
 }

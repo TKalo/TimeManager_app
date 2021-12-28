@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:time_manager/Database/Objects/Category.dart';
-import 'package:time_manager/Logic/CategoryViewModel.dart';
+import 'package:time_manager/Controllers/CategoryViewModel.dart';
 import 'package:time_manager/Utilities/Widgets.dart';
 
 class CategoryListItem extends StatelessWidget {

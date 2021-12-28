@@ -4,7 +4,7 @@ import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:time_manager/Database/Objects/Activity.dart';
 import 'package:time_manager/Database/Objects/Category.dart';
 
-import 'package:time_manager/Logic/MainViewModel.dart';
+import 'package:time_manager/Controllers/MainViewModel.dart';
 import 'package:time_manager/Utilities/Functions.dart';
 import 'package:time_manager/Utilities/Objects.dart';
 

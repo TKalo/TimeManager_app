@@ -3,7 +3,7 @@ import 'package:rxdart/subjects.dart';
 import 'package:time_manager/Database/DatabaseHandler.dart';
 import 'package:time_manager/Database/Objects/Activity.dart';
 import 'package:time_manager/Database/Objects/DatabaseResponse.dart';
-import 'package:time_manager/Logic/MainViewModel.dart';
+import 'package:time_manager/Controllers/MainViewModel.dart';
 import 'package:time_range_picker/time_range_picker.dart';
 import 'package:time_manager/Utilities/Functions.dart';
 import 'package:time_manager/Utilities/Objects.dart';

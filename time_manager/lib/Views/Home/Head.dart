@@ -1,13 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:time_manager/Logic/MainViewModel.dart';
-import 'Diagram.dart';
+import 'package:time_manager/Controllers/MainViewModel.dart';
+import 'package:time_manager/Views/Home/Diagram.dart';
 
 class Head extends StatelessWidget {
   const Head({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-
     return Container(
       height: 260,
       padding: const EdgeInsets.all(16),
@@ -30,10 +29,7 @@ class Head extends StatelessWidget {
               children: [
                 const Expanded(child: Diagram()),
                 Center(
-                  child: StreamBuilder<DateTime>(
-                    stream: MainViewModel().getFocusDay(), 
-                    builder: (context, snapshot) => Text(MainViewModel().formatter.format(snapshot.data ?? DateTime.now()))
-                  ),
+                  child: StreamBuilder<DateTime>(stream: MainViewModel().getFocusDay(), builder: (context, snapshot) => Text(MainViewModel().formatter.format(snapshot.data ?? DateTime.now()))),
                 )
               ],
             ),

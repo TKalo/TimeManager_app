@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:time_manager/Database/Objects/Category.dart';
-import 'package:time_manager/Logic/MainViewModel.dart';
+import 'package:time_manager/Controllers/MainViewModel.dart';
 import 'package:time_manager/Utilities/Objects.dart';
 import 'package:time_manager/Views/Categories/CategoryListItem.dart';
 

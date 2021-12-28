@@ -41,8 +41,8 @@ class DatabaseHandler implements IFrontendDatabase {
 
   Future<void> updateCategoryStream() {
     return _activityLock.synchronized<void>(() async {
-      DatabaseResponseObject<List<ActivityObject>> response = await storage.getActivities();
-      if (response.success) _activities.add(notNullOrFail<List<ActivityObject>>(response.result));
+      DatabaseResponseObject<List<CategoryObject>> response = await storage.getCategories();
+      if (response.success) _categories.add(notNullOrFail<List<CategoryObject>>(response.result));
       return;
     });
   }

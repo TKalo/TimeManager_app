@@ -21,4 +21,5 @@ class MainViewModel {
   Stream<List<ActivityObject>> getActivities() => DatabaseHandler().getActivities();
   Stream<List<CategoryObject>> getCategories() => DatabaseHandler().getCategories();
   void deleteActivity(ActivityObject activity) => DatabaseHandler().deleteActivity(activity);
+  void deleteCategory(CategoryObject category) => DatabaseHandler().deleteCategory(category);
 }

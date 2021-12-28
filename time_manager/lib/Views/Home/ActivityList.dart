@@ -3,8 +3,8 @@ import 'package:rxdart/streams.dart';
 import 'package:time_manager/Database/Objects/ActivityObject.dart';
 import 'package:time_manager/Logic/MainViewModel.dart';
 import 'package:time_manager/Utilities/ActivityManipulation.dart';
+import 'package:time_manager/Utilities/ReusableWidgets.dart';
 import 'package:time_manager/Utilities/helpers.dart';
-
 
 class ActivityList extends StatelessWidget {
   ActivityList({Key? key}) : super(key: key);
@@ -20,7 +20,6 @@ class ActivityList extends StatelessWidget {
       stream: stream,
       builder: (BuildContext context, AsyncSnapshot<List<ActivityObject>> snapshot) {
         List<ActivityObject> activities = snapshot.data ?? [];
-        print('activity list updated: ' + activities.toString());
 
         return ListView.builder(
           itemBuilder: (c, i) => ActivityListItem(activity: activities[i]),
@@ -40,11 +39,19 @@ class ActivityListItem extends StatelessWidget {
   Widget build(BuildContext context) {
     return Dismissible(
       key: ValueKey<ActivityObject>(activity),
-      onDismissed: (DismissDirection direction) {
-        MainViewModel().deleteActivity(activity);
-      },
-      confirmDismiss: (DismissDirection direction) {
-        return showDialog<bool>(
+      onDismissed: (DismissDirection direction) => MainViewModel().deleteActivity(activity),
+      confirmDismiss: (DismissDirection direction) => confirmDismiss(context),
+      child: CustomListTile(
+        leadingColor: Colors.red, 
+        title: activity.name == '' ? activity.category : activity.name,
+        subTitle: getTimeString(activity.starttime) + " - " + getTimeString(activity.endtime)
+      ),
+      background: const ListDeleteBackground(),
+    );
+  }
+
+  Future<bool?> confirmDismiss(BuildContext context) {
+    return showDialog<bool>(
             context: context,
             builder: (context) => AlertDialog(
                   title: const Text('Delete activity?'),
@@ -53,25 +60,5 @@ class ActivityListItem extends StatelessWidget {
                     TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('cancel')),
                   ],
                 ));
-      },
-      child: Card(
-        child: ListTile(
-          contentPadding: const EdgeInsets.all(8),
-          leading: Container(
-            height: 64,
-            width: 64,
-            decoration: const BoxDecoration(shape: BoxShape.circle, color: Colors.red),
-          ),
-          title: Text(activity.name == '' ? activity.category : activity.name),
-          subtitle: Text(getTimeString(activity.starttime) + " - " + getTimeString(activity.endtime)),
-        ),
-      ),
-      background: Container(
-        height: 80,
-        alignment: Alignment.centerRight,
-        padding: const EdgeInsets.all(32),
-        child: const Icon(Icons.delete),
-      ),
-    );
   }
 }

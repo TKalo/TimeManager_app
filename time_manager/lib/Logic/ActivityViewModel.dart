@@ -5,16 +5,16 @@ import 'package:time_manager/Database/Objects/ActivityObject.dart';
 import 'package:time_manager/Logic/MainViewModel.dart';
 import '../Utilities/ActivityManipulation.dart';
 
-class ActivityViewModel {
-  static final ActivityViewModel _singleton = ActivityViewModel._internal();
-  factory ActivityViewModel() => _singleton;
-  ActivityViewModel._internal();
+class AddActivityViewModel {
+  static final AddActivityViewModel _singleton = AddActivityViewModel._internal();
+  factory AddActivityViewModel() => _singleton;
+  AddActivityViewModel._internal();
 
   ActivityObject activity = ActivityObject(starttime: DateTime.now(), endtime: DateTime.now(), category: '');
+
   MainViewModel mainViewModel = MainViewModel();
+
   IFrontendDatabase storage = DatabaseHandler();
-
-
 
   void setInterval(TimeOfDay starttime, TimeOfDay endtime) async {
     DateTime selectedDate = await mainViewModel.getFocusDay().first;

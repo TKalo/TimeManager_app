@@ -3,95 +3,101 @@ import 'package:synchronized/synchronized.dart';
 import 'package:time_manager/Database/FileDatabase/FileDatabase.dart';
 import 'package:time_manager/Database/Interfaces/IBackendDatabase.dart';
 import 'package:time_manager/Database/Interfaces/IFrontendDatabase.dart';
-import 'package:time_manager/Database/Objects/CategoryObject.dart';
-import 'package:time_manager/Database/Objects/DatabaseResponseObject.dart';
-import 'package:time_manager/Utilities/helpers.dart';
+import 'package:time_manager/Database/Objects/Activity.dart';
+import 'package:time_manager/Database/Objects/Category.dart';
+import 'package:time_manager/Database/Objects/DatabaseResponse.dart';
+import 'package:time_manager/Utilities/Functions.dart';
 
-import 'Objects/ActivityObject.dart';
 
 class DatabaseHandler implements IFrontendDatabase {
   static const DatabaseHandler? _singleton = null;
   factory DatabaseHandler({bool debug = false}) => _singleton ?? DatabaseHandler._internal(debug: debug);
-  DatabaseHandler._internal({this.debug = false}) : storage = FileDatabase(debug: debug) {
-    updateActivityStream();
-    updateCategoryStream();
+  DatabaseHandler._internal({bool debug = false}) : _storage = FileDatabase(debug: debug) {
+    _updateStream<Activity>(() => _storage.getActivities(), _activities);
+    _updateStream<Category>(() => _storage.getCategories(), _categories);
   }
 
-  final bool debug;
-  final IBackendDatabase storage;
+  final IBackendDatabase _storage;
 
   final _activityLock = Lock();
   final _categoryLock = Lock();
-  final BehaviorSubject<List<ActivityObject>> _activities = BehaviorSubject.seeded([]);
-  final BehaviorSubject<List<CategoryObject>> _categories = BehaviorSubject.seeded([]);
+  final BehaviorSubject<List<Activity>> _activities = BehaviorSubject.seeded([]);
+  final BehaviorSubject<List<Category>> _categories = BehaviorSubject.seeded([]);
 
   @override
-  Stream<List<ActivityObject>> getActivities() => _activities.stream;
+  Stream<List<Activity>> getActivities() => _activities.stream;
 
   @override
-  Stream<List<CategoryObject>> getCategories() => _categories.stream;
+  Stream<List<Category>> getCategories() => _categories.stream;
 
-  Future<void> updateActivityStream() {
+  Future<void> _updateStream<T>(Future<DatabaseResponse<List<T>>> Function() data, BehaviorSubject<List<T>> stream) {
     return _activityLock.synchronized<void>(() async {
-      DatabaseResponseObject<List<ActivityObject>> response = await storage.getActivities();
-      if (response.success) _activities.add(notNullOrFail<List<ActivityObject>>(response.result));
-      return;
-    });
-  }
-
-  Future<void> updateCategoryStream() {
-    return _activityLock.synchronized<void>(() async {
-      DatabaseResponseObject<List<CategoryObject>> response = await storage.getCategories();
-      if (response.success) _categories.add(notNullOrFail<List<CategoryObject>>(response.result));
+      DatabaseResponse<List<T>> response = await data();
+      if (response.success) stream.add(notNullOrFail<List<T>>(response.result));
       return;
     });
   }
 
   @override
-  Future<DatabaseResponseObject<int>> addActivity(ActivityObject activity) {
-    return _activityLock.synchronized<DatabaseResponseObject<int>>(() {
-      updateActivityStream();
-      return storage.addActivity(activity);
-    });
+  Future<DatabaseResponse<int>> addActivity(Activity activity) {
+    return _databaseFunction<Activity, int>(
+      execution: () => _storage.addActivity(activity), 
+      data: () => _storage.getActivities(), 
+      stream: _activities
+    );
   }
 
   @override
-  Future<DatabaseResponseObject<void>> updateActivity(ActivityObject activity) {
-    return _activityLock.synchronized<DatabaseResponseObject<void>>(() {
-      updateActivityStream();
-      return storage.updateActivity(activity);
-    });
+  Future<DatabaseResponse<void>> updateActivity(Activity activity) {
+    return _databaseFunction<Activity, void>(
+      execution: () => _storage.updateActivity(activity), 
+      data: () => _storage.getActivities(), 
+      stream: _activities
+    );
   }
 
   @override
-  Future<DatabaseResponseObject<void>> deleteActivity(ActivityObject activity) {
-    return _activityLock.synchronized<DatabaseResponseObject<void>>(() {
-      updateActivityStream();
-      return storage.deleteActivity(activity);
-    });
+  Future<DatabaseResponse<void>> deleteActivity(Activity activity) {
+    return _databaseFunction<Activity, void>(
+      execution: () => _storage.deleteActivity(activity), 
+      data: () => _storage.getActivities(), 
+      stream: _activities
+    );
   }
 
   @override
-  Future<DatabaseResponseObject<void>> addCategory(CategoryObject category) {
-    return _categoryLock.synchronized<DatabaseResponseObject<void>>(() {
-      updateCategoryStream();
-      return storage.addCategory(category);
-    });
+  Future<DatabaseResponse<void>> addCategory(Category category) {
+    return _databaseFunction<Category, void>(
+      execution: () => _storage.addCategory(category), 
+      data: () => _storage.getCategories(), 
+      stream: _categories
+    );
   }
 
   @override
-  Future<DatabaseResponseObject<void>> deleteCategory(CategoryObject category) {
-    return _categoryLock.synchronized<DatabaseResponseObject<void>>(() {
-      updateCategoryStream();
-      return storage.deleteCategory(category);
-    });
+  Future<DatabaseResponse<void>> deleteCategory(Category category) {
+    return _databaseFunction<Category, void>(
+      execution: () => _storage.deleteCategory(category), 
+      data: () => _storage.getCategories(), 
+      stream: _categories
+    );
   }
 
   @override
-  Future<DatabaseResponseObject<void>> updateCategory(CategoryObject category) {
-    return _categoryLock.synchronized<DatabaseResponseObject<void>>(() {
-      updateCategoryStream();
-      return storage.updateCategory(category);
+  Future<DatabaseResponse<void>> updateCategory(Category category) {
+    return _databaseFunction<Category, void>(
+      execution: () => _storage.updateCategory(category), 
+      data: () => _storage.getCategories(), 
+      stream: _categories
+    );
+  }
+
+  Future<DatabaseResponse<R>> _databaseFunction<O, R>(
+      {required Future<DatabaseResponse<R>> Function() execution, required Future<DatabaseResponse<List<O>>> Function() data, required BehaviorSubject<List<O>> stream}) {
+    return _categoryLock.synchronized<DatabaseResponse<R>>(() async {
+      DatabaseResponse<R> response = await execution();
+      await _updateStream<Category>(() => _storage.getCategories(), _categories);
+      return response;
     });
   }
 }

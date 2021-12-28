@@ -1,18 +1,18 @@
 import 'package:flutter/material.dart';
 
-class CategoryObject {
+class Category {
 
   String name;
   Color color;
 
-  CategoryObject({required this.name, required this.color});
+  Category({required this.name, required this.color});
 
   Map<String, String> toMap() =>
       {'name': name, 'color': color.value.toRadixString(16)};
 
-  CategoryObject.fromJson(Map<String, dynamic> map)
+  Category.fromJson(Map<String, dynamic> map)
       : name = map['name'] ?? '',
         color = Color(int.parse(map['color'], radix: 16));
   
-  CategoryObject copy() => CategoryObject(name: name, color: color);
+  Category copy() => Category(name: name, color: color);
 }

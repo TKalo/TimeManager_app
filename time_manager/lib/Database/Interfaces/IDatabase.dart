@@ -1,23 +1,23 @@
 
 
-import 'package:time_manager/Database/Objects/ActivityObject.dart';
-import 'package:time_manager/Database/Objects/CategoryObject.dart';
-import 'package:time_manager/Database/Objects/DatabaseResponseObject.dart';
+import 'package:time_manager/Database/Objects/Activity.dart';
+import 'package:time_manager/Database/Objects/Category.dart';
+import 'package:time_manager/Database/Objects/DatabaseResponse.dart';
 
 abstract class IDatabase {
-  Future<DatabaseResponseObject<int>> addActivity(ActivityObject object);
+  Future<DatabaseResponse<int>> addActivity(Activity object);
 
-  Future<DatabaseResponseObject<void>> updateActivity(ActivityObject object);
+  Future<DatabaseResponse<void>> updateActivity(Activity object);
 
-  Future<DatabaseResponseObject<void>> deleteActivity(ActivityObject object);
+  Future<DatabaseResponse<void>> deleteActivity(Activity object);
 
   dynamic getActivities();
 
-  Future<DatabaseResponseObject<void>> addCategory(CategoryObject object);
+  Future<DatabaseResponse<void>> addCategory(Category object);
 
-  Future<DatabaseResponseObject<void>> updateCategory(CategoryObject object);
+  Future<DatabaseResponse<void>> updateCategory(Category object);
 
-  Future<DatabaseResponseObject<void>> deleteCategory(CategoryObject object);
+  Future<DatabaseResponse<void>> deleteCategory(Category object);
 
   dynamic getCategories();
 }

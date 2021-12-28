@@ -4,32 +4,32 @@ import 'package:rxdart/rxdart.dart';
 import 'package:test/test.dart';
 import 'package:time_manager/Database/FileDatabase/ActivityDatabase.dart';
 import 'package:time_manager/Database/FileDatabase/FileDatabase.dart';
-import 'package:time_manager/Database/Objects/ActivityObject.dart';
-import 'package:time_manager/Utilities/helpers.dart';
+import 'package:time_manager/Database/Objects/Activity.dart';
+import 'package:time_manager/Utilities/Functions.dart';
 
 main() {
   final FileDatabase database = FileDatabase(debug: true);
   final BehaviorSubject<int> testOrder = BehaviorSubject.seeded(1);
 
   tearDownAll(() async {
-    List<ActivityObject> activities = notNullOrFail((await database.getActivities()).result);
+    List<Activity> activities = notNullOrFail((await database.getActivities()).result);
 
     expect(activities.isEmpty, false);
     
-    await Future.forEach(activities, (ActivityObject activity) async => await database.deleteActivity(activity));
+    await Future.forEach(activities, (Activity activity) async => await database.deleteActivity(activity));
 
     expect((await database.getActivities()).result?.length, 0);
   });
 
   test('Check correct formatting', () {
-    ActivityObject activity1 =
-        ActivityObject(id: 1, starttime: DateTime(2001, 01, 01, 01, 01), endtime: DateTime(2002, 02, 02, 02, 02), category: 'category1', name: 'name1', description: 'description1');
-    ActivityObject activity2 =
-        ActivityObject(id: 2, starttime: DateTime(2002, 02, 02, 02, 02), endtime: DateTime(2001, 01, 01, 01, 01), category: 'category2', name: 'name2', description: 'description2');
-    List<ActivityObject> activities = [activity1, activity2];
+    Activity activity1 =
+        Activity(id: 1, starttime: DateTime(2001, 01, 01, 01, 01), endtime: DateTime(2002, 02, 02, 02, 02), category: 'category1', name: 'name1', description: 'description1');
+    Activity activity2 =
+        Activity(id: 2, starttime: DateTime(2002, 02, 02, 02, 02), endtime: DateTime(2001, 01, 01, 01, 01), category: 'category2', name: 'name2', description: 'description2');
+    List<Activity> activities = [activity1, activity2];
 
     String json = activityToJson(activities);
-    List<ActivityObject> formattedActivities = jsonToActivities(json);
+    List<Activity> formattedActivities = jsonToActivities(json);
 
     for (int x = 0; x < activities.length; x++) {
       expect(formattedActivities[x].id, activities[x].id);
@@ -51,10 +51,10 @@ main() {
           DateTime startTime = DateTime(2001, 01, 01, 01, 01);
           DateTime endTime = DateTime(2002, 02, 02, 02, 02);
           String category = 'category';
-          ActivityObject activity = ActivityObject(starttime: startTime, endtime: endTime, category: category);
+          Activity activity = Activity(starttime: startTime, endtime: endTime, category: category);
           await database.addActivity(activity);
 
-          ActivityObject retrievedActivity = notNullOrFail((await database.getActivities()).result?[0]);
+          Activity retrievedActivity = notNullOrFail((await database.getActivities()).result?[0]);
           expect(retrievedActivity.id == -1, false);
           expect(retrievedActivity.starttime, startTime);
           expect(retrievedActivity.endtime, retrievedActivity.endtime);
@@ -77,10 +77,10 @@ main() {
           String category = 'category';
           String name = 'name';
           String description = 'description';
-          ActivityObject activity = ActivityObject(id: id, starttime: startTime, endtime: endTime, category: category, name: name, description: description);
+          Activity activity = Activity(id: id, starttime: startTime, endtime: endTime, category: category, name: name, description: description);
           await database.addActivity(activity);
 
-          ActivityObject retrievedActivity = notNullOrFail((await database.getActivities()).result?[1]);
+          Activity retrievedActivity = notNullOrFail((await database.getActivities()).result?[1]);
           expect(retrievedActivity.id == -1, false);
           expect(retrievedActivity.id == -2, false);
           expect(retrievedActivity.starttime, startTime);
@@ -99,14 +99,14 @@ main() {
       sub = testOrder.stream.listen((order) async {
         if (order == 3) {
           //Get some activityObject
-          ActivityObject activity = notNullOrFail((await database.getActivities()).result?[1]);
+          Activity activity = notNullOrFail((await database.getActivities()).result?[1]);
 
           //Change only the starttime
           DateTime newStartTime = activity.starttime.add(const Duration(days: 1, hours: 1, minutes: 1));
           activity.starttime = newStartTime;
           await database.updateActivity(activity);
 
-          ActivityObject newActivity = notNullOrFail((await database.getActivities()).result?[1]);
+          Activity newActivity = notNullOrFail((await database.getActivities()).result?[1]);
 
           //Check that the start time was altered
           expect(newActivity.starttime, newStartTime);
@@ -128,14 +128,14 @@ main() {
       sub = testOrder.stream.listen((order) async {
         if (order == 4) {
           //Get some activityObject
-          ActivityObject activity = notNullOrFail((await database.getActivities()).result?[1]);
+          Activity activity = notNullOrFail((await database.getActivities()).result?[1]);
 
           //Change only the endtime
           DateTime newEndTime = activity.endtime.add(const Duration(days: 1, hours: 1, minutes: 1));
           activity.endtime = newEndTime;
           await database.updateActivity(activity);
 
-          ActivityObject newActivity = notNullOrFail((await database.getActivities()).result?[1]);
+          Activity newActivity = notNullOrFail((await database.getActivities()).result?[1]);
 
           //Check that the endtime was altered
           expect(newActivity.endtime, newEndTime);
@@ -157,14 +157,14 @@ main() {
       sub = testOrder.stream.listen((order) async {
         if (order == 5) {
           //Get some activityObject
-          ActivityObject activity = notNullOrFail((await database.getActivities()).result?[1]);
+          Activity activity = notNullOrFail((await database.getActivities()).result?[1]);
 
           //Change only the endtime
           String newCategory = activity.category + ' new';
           activity.category = newCategory;
           await database.updateActivity(activity);
 
-          ActivityObject newActivity = notNullOrFail((await database.getActivities()).result?[1]);
+          Activity newActivity = notNullOrFail((await database.getActivities()).result?[1]);
 
           //Check that the endtime was altered
           expect(newActivity.category, newCategory);
@@ -186,14 +186,14 @@ main() {
       sub = testOrder.stream.listen((order) async {
         if (order == 6) {
           //Get some activityObject
-          ActivityObject activity = notNullOrFail((await database.getActivities()).result?[1]);
+          Activity activity = notNullOrFail((await database.getActivities()).result?[1]);
 
           //Change only the endtime
           String newDescription = activity.description + ' new';
           activity.description = newDescription;
           await database.updateActivity(activity);
 
-          ActivityObject newActivity = notNullOrFail((await database.getActivities()).result?[1]);
+          Activity newActivity = notNullOrFail((await database.getActivities()).result?[1]);
 
           //Check that the endtime was altered
           expect(newActivity.description, newDescription);
@@ -215,14 +215,14 @@ main() {
       sub = testOrder.stream.listen((order) async {
         if (order == 7) {
           //Get some activityObject
-          ActivityObject activity = notNullOrFail((await database.getActivities()).result?[1]);
+          Activity activity = notNullOrFail((await database.getActivities()).result?[1]);
 
           //Change only the endtime
           String newName = activity.name + ' new';
           activity.name = newName;
           await database.updateActivity(activity);
 
-          ActivityObject newActivity = notNullOrFail((await database.getActivities()).result?[1]);
+          Activity newActivity = notNullOrFail((await database.getActivities()).result?[1]);
 
           //Check that the endtime was altered
           expect(newActivity.name, newName);

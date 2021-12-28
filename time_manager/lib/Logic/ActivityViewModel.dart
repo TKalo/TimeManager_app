@@ -1,76 +1,91 @@
 import 'package:flutter/material.dart';
+import 'package:rxdart/subjects.dart';
 import 'package:time_manager/Database/DatabaseHandler.dart';
-import 'package:time_manager/Database/Interfaces/IFrontendDatabase.dart';
-import 'package:time_manager/Database/Objects/ActivityObject.dart';
+import 'package:time_manager/Database/Objects/Activity.dart';
+import 'package:time_manager/Database/Objects/DatabaseResponse.dart';
 import 'package:time_manager/Logic/MainViewModel.dart';
-import '../Utilities/ActivityManipulation.dart';
-import 'package:time_manager/Utilities/routes.dart';
+import 'package:time_range_picker/time_range_picker.dart';
+import 'package:time_manager/Utilities/Functions.dart';
+import 'package:time_manager/Utilities/Objects.dart';
 
-class AddActivityViewModel {
-  static final AddActivityViewModel _singleton = AddActivityViewModel._internal();
-  factory AddActivityViewModel() => _singleton;
-  AddActivityViewModel._internal();
+class ActivityViewModel {
+  static final ActivityViewModel _singleton = ActivityViewModel._internal();
+  factory ActivityViewModel() => _singleton;
+  ActivityViewModel._internal();
 
-  ActivityObject activity = ActivityObject(starttime: DateTime.now(), endtime: DateTime.now(), category: '');
+  Activity activity = Activity(starttime: DateTime.now(), endtime: DateTime.now(), category: '');
+  final BehaviorSubject<String?> _globalError = BehaviorSubject();
 
-  MainViewModel mainViewModel = MainViewModel();
+  void deleteActivity(Activity activity) => DatabaseHandler().deleteActivity(activity);
 
-  IFrontendDatabase storage = DatabaseHandler();
+  void _resetActivity() => activity = Activity(starttime: DateTime.now(), endtime: DateTime.now(), category: '');
 
-  void setInterval(TimeOfDay starttime, TimeOfDay endtime) async {
-    DateTime selectedDate = await mainViewModel.getFocusDay().first;
+  Future<String> pickTime(BuildContext context) async {
+    TimeRange interval = await showTimeRangePicker(
+        context: context, interval: const Duration(minutes: 5), disabledTime: TimeRange(startTime: const TimeOfDay(hour: 0, minute: 0), endTime: const TimeOfDay(hour: 0, minute: 0)));
 
-    activity.starttime = DateTime(selectedDate.year, selectedDate.month, selectedDate.day, starttime.hour, starttime.minute);
+    DateTime selectedDate = await MainViewModel().getFocusDay().first;
 
-    activity.endtime = DateTime(selectedDate.year, selectedDate.month, selectedDate.day, endtime.hour, endtime.minute);
+    activity.starttime = DateTime(selectedDate.year, selectedDate.month, selectedDate.day, interval.startTime.hour, interval.startTime.minute);
+
+    activity.endtime = DateTime(selectedDate.year, selectedDate.month, selectedDate.day, interval.endTime.hour, interval.endTime.minute);
+
+    return interval.startTime.format(context) + " - " + interval.endTime.format(context);
   }
 
   void submitActivity(BuildContext context) async {
-    List<ActivityObject> allActivities = await storage.getActivities().first;
+    List<Activity> allActivities = await DatabaseHandler().getActivities().first;
 
-    List<ActivityObject> selectedDateActivities = getActivitiesOfDay(allActivities, activity.starttime);
+    List<Activity> selectedDateActivities = getActivitiesOfDay(allActivities, activity.starttime);
 
-    List<ActivityObject> intersectingActivities = getIntersectingActivities(selectedDateActivities, activity);
+    List<Activity> intersectingActivities = getIntersectingActivities(selectedDateActivities, activity);
 
     if (intersectingActivities.isNotEmpty) {
-      _requestIntersectingActivitiesResolution(context, intersectingActivities);
+      _requestActivityConflictResolution(context, intersectingActivities);
     } else {
-      storage.addActivity(activity);
-
-      _resetActivityObject();
-
-      Navigator.pushNamed(context, routes.home.name);
+      _persistActivities([activity], context);
     }
   }
 
-  void navigateToCategoryList() {}
-
-  void _requestIntersectingActivitiesResolution(BuildContext context, List<ActivityObject> intersectingActivities) {
+  void _requestActivityConflictResolution(BuildContext context, List<Activity> intersectingActivities) {
     showDialog(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
             title: const Text('other activities intersect the selected time interval'),
             actions: [
-              TextButton(
-                  onPressed: () {
-                    cropSingleActivity(intersectingActivities, activity);
-                    Navigator.pushNamed(context, routes.home.name);
-                    _resetActivityObject();
-                  },
-                  child: const Text('crop this activity')),
-              TextButton(
-                  onPressed: () {
-                    cropOtherActivities(intersectingActivities, activity);
-                    Navigator.pushNamed(context, routes.home.name);
-                    _resetActivityObject();
-                  },
-                  child: const Text('crop other activities')),
+              TextButton(onPressed: () => _persistActivities(cropSingleActivity(intersectingActivities, activity), context), child: const Text('crop this activity')),
+              TextButton(onPressed: () => _persistActivities(cropListOfActivities(intersectingActivities, activity), context), child: const Text('crop other activities')),
               TextButton(onPressed: () => Navigator.pop(context), child: const Text('cancel'))
             ],
           );
         });
   }
 
-  void _resetActivityObject() => activity = ActivityObject(starttime: DateTime.now(), endtime: DateTime.now(), category: '');
+  void _persistActivities(List<Activity> activities, BuildContext context) async {
+    String? error;
+    for (Activity activity in activities) {
+      DatabaseResponse<int> response = await DatabaseHandler().addActivity(activity);
+
+      if (response.success) {
+        activity.id = response.result ?? -1;
+      } else {
+        error = response.error;
+        break;
+      }
+    }
+
+    if (error != null) {
+      String? rollbackError;
+
+      for (Activity activity in activities) {
+        rollbackError = (await DatabaseHandler().deleteActivity(activity)).error;
+      }
+
+      _globalError.add(rollbackError ?? error);
+    } else {
+      Navigator.pushNamed(context, routes.home.name);
+      _resetActivity();
+    }
+  }
 }

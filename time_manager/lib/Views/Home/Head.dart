@@ -1,16 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:time_manager/Logic/MainViewModel.dart';
 import 'Diagram.dart';
 
 class Head extends StatelessWidget {
-  Head({Key? key}) : super(key: key);
-
-  final MainViewModel mainViewModel = MainViewModel();
-  final DateFormat formatter = DateFormat('dd/MM/yyyy');
+  const Head({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+
     return Container(
       height: 260,
       padding: const EdgeInsets.all(16),
@@ -20,7 +17,7 @@ class Head extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           IconButton(
-            onPressed: () => mainViewModel.decreaseFocusDay(),
+            onPressed: () => MainViewModel().decreaseFocusDay(),
             icon: const Icon(
               Icons.arrow_back,
               color: Colors.white,
@@ -33,13 +30,16 @@ class Head extends StatelessWidget {
               children: [
                 const Expanded(child: Diagram()),
                 Center(
-                  child: StreamBuilder<DateTime>(stream: mainViewModel.getFocusDay(), builder: (context, snapshot) => Text(formatter.format(snapshot.data ?? DateTime.now()))),
+                  child: StreamBuilder<DateTime>(
+                    stream: MainViewModel().getFocusDay(), 
+                    builder: (context, snapshot) => Text(MainViewModel().formatter.format(snapshot.data ?? DateTime.now()))
+                  ),
                 )
               ],
             ),
           ),
           IconButton(
-            onPressed: () => mainViewModel.increaseFocusDay(),
+            onPressed: () => MainViewModel().increaseFocusDay(),
             icon: const Icon(
               Icons.arrow_forward,
               color: Colors.white,

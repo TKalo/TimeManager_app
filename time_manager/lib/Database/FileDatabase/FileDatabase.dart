@@ -3,9 +3,9 @@
 import 'package:time_manager/Database/FileDatabase/ActivityDatabase.dart';
 import 'package:time_manager/Database/FileDatabase/CategoryDatabase.dart';
 import 'package:time_manager/Database/Interfaces/IBackendDatabase.dart';
-import 'package:time_manager/Database/Objects/ActivityObject.dart';
-import 'package:time_manager/Database/Objects/CategoryObject.dart';
-import 'package:time_manager/Database/Objects/DatabaseResponseObject.dart';
+import 'package:time_manager/Database/Objects/Activity.dart';
+import 'package:time_manager/Database/Objects/Category.dart';
+import 'package:time_manager/Database/Objects/DatabaseResponse.dart';
 
 import 'FileConnection.dart';
 
@@ -19,26 +19,26 @@ class FileDatabase implements IBackendDatabase {
         _categoryDB = CategoryDatabase(connection: debug ? FileConnection(filename: 'categories_test') : FileConnection(filename: 'categories'));
 
   @override
-  Future<DatabaseResponseObject<void>> addCategory(CategoryObject category) => _categoryDB.addCategory(category);
+  Future<DatabaseResponse<void>> addCategory(Category category) => _categoryDB.addCategory(category);
 
   @override
-  Future<DatabaseResponseObject<void>> deleteCategory(CategoryObject category) => _categoryDB.deletecategory(category);
+  Future<DatabaseResponse<void>> deleteCategory(Category category) => _categoryDB.deletecategory(category);
 
   @override
-  Future<DatabaseResponseObject<List<CategoryObject>>> getCategories() => _categoryDB.getcategories();
+  Future<DatabaseResponse<List<Category>>> getCategories() => _categoryDB.getcategories();
 
   @override
-  Future<DatabaseResponseObject<void>> updateCategory(CategoryObject category) => _categoryDB.updatecategory(category);
+  Future<DatabaseResponse<void>> updateCategory(Category category) => _categoryDB.updatecategory(category);
 
   @override
-  Future<DatabaseResponseObject<int>> addActivity(ActivityObject activity) => _activityDB.addActivity(activity);
+  Future<DatabaseResponse<int>> addActivity(Activity activity) => _activityDB.addActivity(activity);
 
   @override
-  Future<DatabaseResponseObject<void>> deleteActivity(ActivityObject activity) => _activityDB.deleteActivity(activity);
+  Future<DatabaseResponse<void>> deleteActivity(Activity activity) => _activityDB.deleteActivity(activity);
 
   @override
-  Future<DatabaseResponseObject<List<ActivityObject>>> getActivities() => _activityDB.getActivities();
+  Future<DatabaseResponse<List<Activity>>> getActivities() => _activityDB.getActivities();
 
   @override
-  Future<DatabaseResponseObject<void>> updateActivity(ActivityObject activity) => _activityDB.updateActivity(activity);
+  Future<DatabaseResponse<void>> updateActivity(Activity activity) => _activityDB.updateActivity(activity);
 }

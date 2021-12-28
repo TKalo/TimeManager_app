@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:time_manager/Utilities/routes.dart';
-import 'ActivityList.dart';
+import 'package:time_manager/Utilities/Objects.dart';
+import 'package:time_manager/Views/Activities/ActivityList.dart';
 import 'Head.dart';
 
 class Home extends StatelessWidget {
@@ -10,9 +10,8 @@ class Home extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: const Color(0xfff5f5f5),
-
       body: Column(
-        children: [
+        children: const [
           Head(),
           Expanded(
             child: ActivityList(),
@@ -27,4 +26,3 @@ class Home extends StatelessWidget {
     );
   }
 }
-

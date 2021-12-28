@@ -2,33 +2,40 @@ import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:time_manager/Database/DatabaseHandler.dart';
-import 'package:time_manager/Database/Objects/ActivityObject.dart';
-import 'package:time_manager/Utilities/helpers.dart';
+import 'package:time_manager/Database/Objects/Activity.dart';
+import 'package:time_manager/Utilities/Functions.dart';
 
 main() {
   DatabaseHandler database = DatabaseHandler(debug: true);
   setUp(() async {
     sleep(const Duration(seconds: 2));
-    List<ActivityObject> activities = notNullOrFail(await database.getActivities().first);
-    await Future.forEach(activities, (ActivityObject activity) async => await database.deleteActivity(activity));
+    List<Activity> activities = notNullOrFail(await database.getActivities().first);
+    await Future.forEach(activities, (Activity activity) async => await database.deleteActivity(activity));
+    sleep(const Duration(seconds: 2));
+  });
+
+  tearDown(() async {
+    List<Activity> activities = notNullOrFail(await database.getActivities().first);
+    await Future.forEach(activities, (Activity activity) async => await database.deleteActivity(activity));
   });
 
   test('DatabaseHandler', () async {
+
     //TEST DATABASE EMPTY
-    List<ActivityObject> activities = await database.getActivities().first;
+    List<Activity> activities = await database.getActivities().first;
     expect(activities.length, 0, reason: 'database initially not empty');
 
     //TEST ADDACTIVITY
     DateTime startTime = DateTime(2001, 01, 01, 01, 01);
     DateTime endTime = DateTime(2002, 02, 02, 02, 02);
     String category = 'category';
-    ActivityObject activity = ActivityObject(starttime: startTime, endtime: endTime, category: category);
+    Activity activity = Activity(starttime: startTime, endtime: endTime, category: category);
     await database.addActivity(activity);
 
     activities = notNullOrFail(await database.getActivities().first);
     expect(activities.length, 1, reason: 'activity not added');
 
-    ActivityObject retrievedActivity = activities[0];
+    Activity retrievedActivity = activities[0];
     expect(retrievedActivity.id == -1, false);
     expect(retrievedActivity.starttime, startTime);
     expect(retrievedActivity.endtime, retrievedActivity.endtime);

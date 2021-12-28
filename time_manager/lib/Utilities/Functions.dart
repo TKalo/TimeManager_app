@@ -1,15 +1,25 @@
 
+import 'package:flutter/material.dart';
+import 'package:time_manager/Database/Objects/Activity.dart';
+import 'package:time_manager/Database/Objects/Category.dart';
+import 'package:time_manager/Utilities/Objects.dart';
 
-import 'package:time_manager/Database/Objects/ActivityObject.dart';
+
+String getTimeString(DateTime dateTime) => dateTime.hour.toString().padLeft(2, '0') + ":" + dateTime.minute.toString().padLeft(2, '0');
+
+T notNullOrFail<T>(T? object) {
+  if (object == null) NullThrownError();
+  return object as T;
+}
 
 ///Crops [activity] in relation to [activities] and returns list of cropped activities
-List<ActivityObject> cropSingleActivity(List<ActivityObject> activities, activity) {
+List<Activity> cropSingleActivity(List<Activity> activities, activity) {
   //SORT OBJECTS BY DATETIME
 
-  List<ActivityObject> croppedList = [activity];
+  List<Activity> croppedList = [activity];
 
-  for (ActivityObject existingActivity in activities) {
-    List<ActivityObject> tempList = [];
+  for (Activity existingActivity in activities) {
+    List<Activity> tempList = [];
 
     croppedList.forEach((element) => tempList.addAll(_cropActivity(activity, existingActivity)));
 
@@ -20,8 +30,8 @@ List<ActivityObject> cropSingleActivity(List<ActivityObject> activities, activit
 }
 
 ///Crops activities in [activities] in relation to [activity] and returns list of cropped activities
-List<ActivityObject> cropOtherActivities(List<ActivityObject> activities, ActivityObject activity) {
-  List<ActivityObject> croppedList = [];
+List<Activity> cropListOfActivities(List<Activity> activities, Activity activity) {
+  List<Activity> croppedList = [];
 
   activities.forEach((existingActivity) => croppedList.addAll(_cropActivity(existingActivity, activity)));
 
@@ -29,7 +39,7 @@ List<ActivityObject> cropOtherActivities(List<ActivityObject> activities, Activi
 }
 
 ///Crops [toCrop] in relation to [notToCrop] and returns list of cropped activities
-List<ActivityObject> _cropActivity(ActivityObject toCrop, ActivityObject notToCrop) {
+List<Activity> _cropActivity(Activity toCrop, Activity notToCrop) {
   //toCrop is inside notToCrop and is removed completely
   if ((toCrop.starttime.isAfter(notToCrop.starttime) || toCrop.starttime.isAtSameMomentAs(notToCrop.starttime)) &&
       (toCrop.endtime.isBefore(notToCrop.endtime) || toCrop.endtime.isAtSameMomentAs(notToCrop.endtime))) return [];
@@ -51,7 +61,7 @@ List<ActivityObject> _cropActivity(ActivityObject toCrop, ActivityObject notToCr
   return [toCrop];
 }
 
-List<ActivityObject> getIntersectingActivities(List<ActivityObject> activities, activity) {
+List<Activity> getIntersectingActivities(List<Activity> activities, activity) {
   return activities.where((existingActivity) {
     //Check if existing activity starttime intersect with new activity time interval
     if ((existingActivity.starttime.isAfter(activity.starttime) || existingActivity.starttime.isAtSameMomentAs(activity.starttime)) && existingActivity.starttime.isBefore(activity.endtime))
@@ -67,8 +77,8 @@ List<ActivityObject> getIntersectingActivities(List<ActivityObject> activities, 
   }).toList();
 }
 
-List<ActivityObject> getActivitiesOfDay(List<ActivityObject> activities, DateTime date) {
-  List<ActivityObject> activitesOfDay = activities.where((activity) {
+List<Activity> getActivitiesOfDay(List<Activity> activities, DateTime date) {
+  List<Activity> activitesOfDay = activities.where((activity) {
     DateTime cleanDate1 = DateTime(activity.starttime.year, activity.starttime.month, activity.starttime.day);
     DateTime cleanDate2 = DateTime(date.year, date.month, date.day);
     return cleanDate1.isAtSameMomentAs(cleanDate2);
@@ -79,6 +89,23 @@ List<ActivityObject> getActivitiesOfDay(List<ActivityObject> activities, DateTim
   return activitesOfDay;
 }
 
-void sortActivitiesByDateTime(List<ActivityObject> activities) {
+List<Pair<Activity, Color?>> getActivitiesWithColors(List<Activity> activities, List<Category> categories) {
+  Map<String,Color> categoryMap = Map.fromEntries(categories.map((category) => MapEntry(category.name, category.color))); 
+  return activities.map((activity) => Pair(first: activity, last: categoryMap[activity.category])).toList();
+}
+
+List<Pair<Activity, Color?>> getDiagramData(List<Activity> activities, DateTime date, List<Category> categories) {
+    activities = getActivitiesOfDay(activities, date);
+
+    Activity defaultActivity = Activity(starttime: DateTime(date.year, date.month, date.day, 0, 0), endtime: DateTime(date.year, date.month, date.day, 23, 59), category: 'default');
+
+    activities = activities..addAll(cropSingleActivity(activities, defaultActivity));
+
+    sortActivitiesByDateTime(activities);
+
+    return getActivitiesWithColors(activities, categories);
+  }
+
+void sortActivitiesByDateTime(List<Activity> activities) {
   activities.sort((a, b) => a.starttime.compareTo(b.starttime));
 }

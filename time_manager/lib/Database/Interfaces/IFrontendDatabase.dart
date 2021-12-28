@@ -1,13 +1,13 @@
 
 import 'package:time_manager/Database/Interfaces/IDatabase.dart';
-import 'package:time_manager/Database/Objects/ActivityObject.dart';
-import 'package:time_manager/Database/Objects/CategoryObject.dart';
+import 'package:time_manager/Database/Objects/Activity.dart';
+import 'package:time_manager/Database/Objects/Category.dart';
 
 abstract class IFrontendDatabase implements IDatabase {
 
   @override
-  Stream<List<ActivityObject>> getActivities();
+  Stream<List<Activity>> getActivities();
 
   @override
-  Stream<List<CategoryObject>> getCategories();
+  Stream<List<Category>> getCategories();
 }

@@ -1,15 +1,15 @@
 
 import 'package:time_manager/Database/Interfaces/IDatabase.dart';
-import 'package:time_manager/Database/Objects/ActivityObject.dart';
-import 'package:time_manager/Database/Objects/CategoryObject.dart';
+import 'package:time_manager/Database/Objects/Activity.dart';
+import 'package:time_manager/Database/Objects/Category.dart';
 
-import '../Objects/DatabaseResponseObject.dart';
+import '../Objects/DatabaseResponse.dart';
 
 abstract class IBackendDatabase implements IDatabase {
 
   @override
-  Future<DatabaseResponseObject<List<ActivityObject>>> getActivities();
+  Future<DatabaseResponse<List<Activity>>> getActivities();
 
   @override
-  Future<DatabaseResponseObject<List<CategoryObject>>> getCategories();
+  Future<DatabaseResponse<List<Category>>> getCategories();
 }

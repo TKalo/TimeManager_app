@@ -1,7 +1,7 @@
 import 'dart:convert';
-import 'package:time_manager/Database/Objects/ActivityObject.dart';
-import 'package:time_manager/Database/Objects/DatabaseResponseObject.dart';
-import 'package:time_manager/Utilities/helpers.dart';
+import 'package:time_manager/Database/Objects/Activity.dart';
+import 'package:time_manager/Database/Objects/DatabaseResponse.dart';
+import 'package:time_manager/Utilities/Functions.dart';
 
 import 'FileConnection.dart';
 
@@ -10,10 +10,10 @@ class ActivityDatabase {
 
   ActivityDatabase({required this.connection});
 
-  Future<DatabaseResponseObject<int>> addActivity(ActivityObject activity) async {
+  Future<DatabaseResponse<int>> addActivity(Activity activity) async {
     try {
       //get existing activies
-      List<ActivityObject> activities = notNullOrFail((await getActivities()).result);
+      List<Activity> activities = notNullOrFail((await getActivities()).result);
 
       //set unused id
       activity.id = getUnusedId(activities);
@@ -24,16 +24,16 @@ class ActivityDatabase {
       //persist new activity list
       await connection.overwriteDatabase(activityToJson(activities));
 
-      return DatabaseResponseObject<int>.success(result: activity.id);
+      return DatabaseResponse<int>.success(result: activity.id);
     } catch (e) {
-      return DatabaseResponseObject.error(error: e.toString());
+      return DatabaseResponse.error(error: e.toString());
     }
   }
 
-  Future<DatabaseResponseObject> updateActivity(ActivityObject activity) async {
+  Future<DatabaseResponse> updateActivity(Activity activity) async {
     try {
       //get existing activies
-      List<ActivityObject> activities = notNullOrFail((await getActivities()).result);
+      List<Activity> activities = notNullOrFail((await getActivities()).result);
 
       //remove old version of activity and add new version
       activities.removeWhere((existingActivity) => existingActivity.id == activity.id);
@@ -42,16 +42,16 @@ class ActivityDatabase {
       //persist new activity list
       await connection.overwriteDatabase(activityToJson(activities));
 
-      return DatabaseResponseObject<void>.success();
+      return DatabaseResponse<void>.success();
     } catch (e) {
-      return DatabaseResponseObject.error(error: e.toString());
+      return DatabaseResponse.error(error: e.toString());
     }
   }
 
-  Future<DatabaseResponseObject> deleteActivity(ActivityObject activity) async {
+  Future<DatabaseResponse> deleteActivity(Activity activity) async {
     try {
       //get existing activies
-      List<ActivityObject> activities = notNullOrFail((await getActivities()).result);
+      List<Activity> activities = notNullOrFail((await getActivities()).result);
 
       //add new activity
       activities.removeWhere((existingActivity) => existingActivity.id == activity.id);
@@ -59,26 +59,26 @@ class ActivityDatabase {
       //persist new activity list
       await connection.overwriteDatabase(activityToJson(activities));
 
-      return DatabaseResponseObject<void>.success();
+      return DatabaseResponse<void>.success();
     } catch (e) {
-      return DatabaseResponseObject.error(error: e.toString());
+      return DatabaseResponse.error(error: e.toString());
     }
   }
 
 
-  Future<DatabaseResponseObject<List<ActivityObject>>> getActivities() async {
+  Future<DatabaseResponse<List<Activity>>> getActivities() async {
     try {
       String json = await connection.loadDatabase();
 
-      List<ActivityObject> activities = jsonToActivities(json);
+      List<Activity> activities = jsonToActivities(json);
 
-      return DatabaseResponseObject.success(result: activities);
+      return DatabaseResponse.success(result: activities);
     } catch (e) {
-      return DatabaseResponseObject.error(error: e.toString());
+      return DatabaseResponse.error(error: e.toString());
     }
   }
 
-  int getUnusedId(List<ActivityObject> activities) {
+  int getUnusedId(List<Activity> activities) {
     int id = 0;
 
     for (id; id < 10000; id++) if (!activities.any((activity) => activity.id == id)) break;
@@ -88,5 +88,5 @@ class ActivityDatabase {
 
 }
 
-String activityToJson(List<ActivityObject> activities) => jsonEncode(activities.map((activity) => activity.toMap()).toList());
-List<ActivityObject> jsonToActivities(String json) => json == '' ? [] : jsonDecode(json).map<ActivityObject>((e) => ActivityObject.fromJson(e)).toList();
+String activityToJson(List<Activity> activities) => jsonEncode(activities.map((activity) => activity.toMap()).toList());
+List<Activity> jsonToActivities(String json) => json == '' ? [] : jsonDecode(json).map<Activity>((e) => Activity.fromJson(e)).toList();

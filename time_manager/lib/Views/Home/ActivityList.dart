@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:rxdart/streams.dart';
 import 'package:time_manager/Database/Objects/ActivityObject.dart';
+import 'package:time_manager/Database/Objects/CategoryObject.dart';
 import 'package:time_manager/Logic/MainViewModel.dart';
 import 'package:time_manager/Utilities/ActivityManipulation.dart';
 import 'package:time_manager/Utilities/ReusableWidgets.dart';
@@ -41,10 +42,17 @@ class ActivityListItem extends StatelessWidget {
       key: ValueKey<ActivityObject>(activity),
       onDismissed: (DismissDirection direction) => MainViewModel().deleteActivity(activity),
       confirmDismiss: (DismissDirection direction) => confirmDismiss(context),
-      child: CustomListTile(
-        leadingColor: Colors.red, 
-        title: activity.name == '' ? activity.category : activity.name,
-        subTitle: getTimeString(activity.starttime) + " - " + getTimeString(activity.endtime)
+      child: StreamBuilder<List<CategoryObject>>(
+        stream: MainViewModel().getCategories(),
+        builder: (context, snapshot) {
+          List<CategoryObject> categories = snapshot.data ?? [];
+          Map<String,Color> categoryMap = Map.fromEntries(categories.map((category) => MapEntry(category.name, category.color)));
+          return CustomListTile(
+            leadingColor: categoryMap[activity.category],
+            title: activity.name == '' ? activity.category : activity.name,
+            subTitle: getTimeString(activity.starttime) + " - " + getTimeString(activity.endtime)
+          );
+        }
       ),
       background: const ListDeleteBackground(),
     );

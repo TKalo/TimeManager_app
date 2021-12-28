@@ -3,7 +3,6 @@ import 'package:rxdart/rxdart.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import 'package:time_manager/Database/Objects/ActivityObject.dart';
 import 'package:time_manager/Database/Objects/CategoryObject.dart';
-import 'package:time_manager/Logic/DiagramViewModel.dart';
 import 'package:time_manager/Logic/MainViewModel.dart';
 import 'package:time_manager/Utilities/Pair.dart';
 
@@ -15,7 +14,7 @@ class Diagram extends StatelessWidget {
   Widget build(BuildContext context) {
     Stream<List<Pair<ActivityObject,Color>>> stream = CombineLatestStream.combine3<List<ActivityObject>, DateTime, List<CategoryObject>, List<Pair<ActivityObject, Color>>>(
         MainViewModel().getActivities(), MainViewModel().getFocusDay(), MainViewModel().getCategories(),
-        (List<ActivityObject> activities, DateTime? date, List<CategoryObject> categories) => DiagramViewModel().processData(activities, date ?? DateTime.now(), categories)
+        (List<ActivityObject> activities, DateTime? date, List<CategoryObject> categories) => MainViewModel().processData(activities, date ?? DateTime.now(), categories)
     );
 
     return StreamBuilder<List<Pair<ActivityObject, Color>>>(

@@ -4,6 +4,7 @@ import 'package:time_manager/Database/Interfaces/IFrontendDatabase.dart';
 import 'package:time_manager/Database/Objects/ActivityObject.dart';
 import 'package:time_manager/Logic/MainViewModel.dart';
 import '../Utilities/ActivityManipulation.dart';
+import 'package:time_manager/Utilities/routes.dart';
 
 class AddActivityViewModel {
   static final AddActivityViewModel _singleton = AddActivityViewModel._internal();

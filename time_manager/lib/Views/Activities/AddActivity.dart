@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:time_manager/Database/Objects/CategoryObject.dart';
 import 'package:time_manager/Logic/ActivityViewModel.dart';
+import 'package:time_manager/Logic/MainViewModel.dart';
 import 'package:time_range_picker/time_range_picker.dart';
 import 'package:time_manager/Utilities/routes.dart';
 
@@ -30,16 +32,23 @@ class AddActivity extends StatelessWidget {
               Row(
                 children: [
                   Expanded(
-                    child: DropdownButtonFormField<String>(
-                      onChanged: (item) => viewModel.activity.category = item ?? '',
-                      items: types.map((e) => DropdownMenuItem(child: Text(e),value: e,)).toList(),
-                      decoration: const InputDecoration(labelText: 'Activity Category *', border: OutlineInputBorder()),
-                    ),
+                    child: StreamBuilder<List<CategoryObject>>(
+                        stream: MainViewModel().getCategories(),
+                        builder: (context, snapshot) {
+                          List<CategoryObject> categories = snapshot.data ?? [];
+                          return DropdownButtonFormField<CategoryObject>(
+                            onChanged: (item) => viewModel.activity.category = item?.name ?? '',
+                            items: categories
+                                .map((category) => DropdownMenuItem(
+                                      child: Text(category.name),
+                                      value: category,
+                                    ))
+                                .toList(),
+                            decoration: const InputDecoration(labelText: 'Activity Category *', border: OutlineInputBorder()),
+                          );
+                        }),
                   ),
-                  IconButton(
-                    onPressed: () => Navigator.pushNamed(context, routes.categoryList.name),
-                    icon: const Icon(Icons.edit)
-                  )
+                  IconButton(onPressed: () => Navigator.pushNamed(context, routes.categoryList.name), icon: const Icon(Icons.edit))
                 ],
               ),
 
@@ -59,7 +68,7 @@ class AddActivity extends StatelessWidget {
               TextFormField(
                   controller: timeContoller,
                   keyboardType: TextInputType.multiline,
-                  decoration: const InputDecoration(labelText: 'Activity time', border: OutlineInputBorder()),
+                  decoration: const InputDecoration(labelText: 'Activity time *', border: OutlineInputBorder()),
                   readOnly: true,
                   onTap: () => onTimeFormFieldTap(context)),
 
@@ -76,11 +85,7 @@ class AddActivity extends StatelessWidget {
 
   void onTimeFormFieldTap(BuildContext context) async {
     TimeRange interval = await showTimeRangePicker(
-      context: context,
-      interval: const Duration(minutes: 5),
-      disabledTime: TimeRange(startTime: const TimeOfDay(hour: 0, minute: 0), endTime: const TimeOfDay(hour: 0, minute: 0))
-
-    );
+        context: context, interval: const Duration(minutes: 5), disabledTime: TimeRange(startTime: const TimeOfDay(hour: 0, minute: 0), endTime: const TimeOfDay(hour: 0, minute: 0)));
 
     viewModel.setInterval(interval.startTime, interval.endTime);
     timeContoller.text = interval.startTime.format(context) + " - " + interval.endTime.format(context);

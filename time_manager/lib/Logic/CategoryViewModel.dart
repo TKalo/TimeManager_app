@@ -5,7 +5,7 @@ import 'package:time_manager/Database/DatabaseHandler.dart';
 import 'package:time_manager/Database/Interfaces/IFrontendDatabase.dart';
 import 'package:time_manager/Database/Objects/CategoryObject.dart';
 import 'package:time_manager/Database/Objects/DatabaseResponseObject.dart';
-import 'package:time_manager/Logic/MainViewModel.dart';
+import 'package:time_manager/Utilities/routes.dart';
 
 class CategoryViewModel {
   static final CategoryViewModel _singleton = CategoryViewModel._internal();

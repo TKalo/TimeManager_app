@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
+import 'package:time_manager/Database/Objects/CategoryObject.dart';
 
-import '../persistence/Objects/CategoryObject.dart';
+
 
 class AddCategoryViewModel {
   static final AddCategoryViewModel _singleton = AddCategoryViewModel._internal();

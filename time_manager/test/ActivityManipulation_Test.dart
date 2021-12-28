@@ -1,6 +1,7 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:time_manager/Processing/ActivityManipulation.dart';
-import 'package:time_manager/persistence/Objects/ActivityObject.dart';
+import 'package:time_manager/Database/Objects/ActivityObject.dart';
+import 'package:time_manager/Utilities/ActivityManipulation.dart';
+
 
 main() {
   ActivityObject object0 = ActivityObject(id: 0, starttime: DateTime(2000, 1, 0, 0), endtime: DateTime(2000, 1, 0, 2), category: 'category');

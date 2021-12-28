@@ -1,9 +1,8 @@
 import 'dart:convert';
+import 'package:time_manager/Database/Objects/ActivityObject.dart';
+import 'package:time_manager/Database/Objects/DatabaseResponseObject.dart';
+import 'package:time_manager/Utilities/helpers.dart';
 
-import 'package:time_manager/persistence/Objects/ActivityObject.dart';
-import 'package:time_manager/persistence/Objects/DatabaseResponseObject.dart';
-
-import '../../helpers.dart';
 import 'FileConnection.dart';
 
 class ActivityDatabase {

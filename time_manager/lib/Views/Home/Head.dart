@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
-
-import '../Processing/MainViewModel.dart';
+import 'package:time_manager/Logic/MainViewModel.dart';
 import 'Diagram.dart';
 
 class Head extends StatelessWidget {

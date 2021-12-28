@@ -1,9 +1,11 @@
-import 'package:time_manager/persistence/FileDatabase/ActivityDatabase.dart';
-import 'package:time_manager/persistence/FileDatabase/CategoryDatabase.dart';
-import 'package:time_manager/persistence/Objects/CategoryObject.dart';
-import 'package:time_manager/persistence/Objects/ActivityObject.dart';
-import 'package:time_manager/persistence/Objects/DatabaseResponseObject.dart';
-import 'package:time_manager/persistence/Interfaces/IBackendDatabase.dart';
+
+
+import 'package:time_manager/Database/FileDatabase/ActivityDatabase.dart';
+import 'package:time_manager/Database/FileDatabase/CategoryDatabase.dart';
+import 'package:time_manager/Database/Interfaces/IBackendDatabase.dart';
+import 'package:time_manager/Database/Objects/ActivityObject.dart';
+import 'package:time_manager/Database/Objects/CategoryObject.dart';
+import 'package:time_manager/Database/Objects/DatabaseResponseObject.dart';
 
 import 'FileConnection.dart';
 

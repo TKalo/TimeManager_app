@@ -2,10 +2,10 @@ import 'dart:async';
 
 import 'package:rxdart/rxdart.dart';
 import 'package:test/test.dart';
-import 'package:time_manager/helpers.dart';
-import 'package:time_manager/persistence/FileDatabase/ActivityDatabase.dart';
-import 'package:time_manager/persistence/Objects/ActivityObject.dart';
-import 'package:time_manager/persistence/FileDatabase/FileDatabase.dart';
+import 'package:time_manager/Database/FileDatabase/ActivityDatabase.dart';
+import 'package:time_manager/Database/FileDatabase/FileDatabase.dart';
+import 'package:time_manager/Database/Objects/ActivityObject.dart';
+import 'package:time_manager/Utilities/helpers.dart';
 
 main() {
   final FileDatabase database = FileDatabase(debug: true);

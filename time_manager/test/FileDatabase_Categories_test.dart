@@ -3,11 +3,11 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:rxdart/subjects.dart';
-import 'package:time_manager/helpers.dart';
-import 'package:time_manager/persistence/FileDatabase/CategoryDatabase.dart';
-import 'package:time_manager/persistence/FileDatabase/FileDatabase.dart';
-import 'package:time_manager/persistence/Objects/CategoryObject.dart';
-import 'package:time_manager/persistence/Objects/DatabaseResponseObject.dart';
+import 'package:time_manager/Database/FileDatabase/CategoryDatabase.dart';
+import 'package:time_manager/Database/FileDatabase/FileDatabase.dart';
+import 'package:time_manager/Database/Objects/CategoryObject.dart';
+import 'package:time_manager/Database/Objects/DatabaseResponseObject.dart';
+import 'package:time_manager/Utilities/helpers.dart';
 
 main() {
   final FileDatabase database = FileDatabase(debug: true);

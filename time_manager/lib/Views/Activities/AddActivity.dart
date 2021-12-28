@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:time_manager/Processing/AddActivityViewModel.dart';
+import 'package:time_manager/Logic/AddActivityViewModel.dart';
 import 'package:time_range_picker/time_range_picker.dart';
-import 'package:time_manager/Processing/MainViewModel.dart';
+import 'package:time_manager/Utilities/routes.dart';
 
 class AddActivity extends StatelessWidget {
   AddActivity({Key? key}) : super(key: key);

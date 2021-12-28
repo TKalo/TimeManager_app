@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:time_manager/Processing/MainViewModel.dart';
+import 'package:time_manager/Database/Objects/CategoryObject.dart';
+import 'package:time_manager/Logic/MainViewModel.dart';
 
-import '../persistence/Objects/CategoryObject.dart';
 
 class CategoryList extends StatelessWidget {
   const CategoryList({Key? key}) : super(key: key);

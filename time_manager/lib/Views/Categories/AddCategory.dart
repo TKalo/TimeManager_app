@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:time_manager/Processing/AddCategoryViewModel.dart';
-import 'package:time_manager/persistence/Objects/CategoryObject.dart';
+import 'package:time_manager/Database/Objects/CategoryObject.dart';
+import 'package:time_manager/Logic/AddCategoryViewModel.dart';
+
 
 class AddCategory extends StatelessWidget {
   AddCategory({Key? key}) : super(key: key);

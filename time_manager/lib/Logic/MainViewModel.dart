@@ -1,7 +1,8 @@
 import 'package:rxdart/rxdart.dart';
-import 'package:time_manager/persistence/Objects/ActivityObject.dart';
-import 'package:time_manager/persistence/DatabaseHandler.dart';
-import 'package:time_manager/persistence/Objects/CategoryObject.dart';
+import 'package:time_manager/Database/DatabaseHandler.dart';
+import 'package:time_manager/Database/Objects/ActivityObject.dart';
+import 'package:time_manager/Database/Objects/CategoryObject.dart';
+
 
 
 enum routes { home, addActivity, categoryList, addCategory}
@@ -18,6 +19,6 @@ class MainViewModel {
   void decreaseFocusDay() async => _focusDay.add((await _focusDay.first).subtract(const Duration(days: 1)));
 
   Stream<List<ActivityObject>> getActivities() => DatabaseHandler().getActivities();
-    Stream<List<CategoryObject>> getCategories() => DatabaseHandler().getCategories();
+  Stream<List<CategoryObject>> getCategories() => DatabaseHandler().getCategories();
   void deleteActivity(ActivityObject activity) => DatabaseHandler().deleteActivity(activity);
 }

@@ -1,4 +1,6 @@
-import 'package:time_manager/persistence/Objects/ActivityObject.dart';
+
+
+import 'package:time_manager/Database/Objects/ActivityObject.dart';
 
 ///Crops [activity] in relation to [activities] and returns list of cropped activities
 List<ActivityObject> cropSingleActivity(List<ActivityObject> activities, activity) {

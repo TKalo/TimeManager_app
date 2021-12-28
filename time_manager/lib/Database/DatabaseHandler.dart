@@ -1,12 +1,12 @@
 import 'package:rxdart/rxdart.dart';
 import 'package:synchronized/synchronized.dart';
-import 'package:time_manager/persistence/Objects/CategoryObject.dart';
-import 'package:time_manager/persistence/Objects/DatabaseResponseObject.dart';
-import 'package:time_manager/persistence/FileDatabase/FileDatabase.dart';
-import 'package:time_manager/persistence/Interfaces/IBackendDatabase.dart';
-import 'package:time_manager/persistence/Interfaces/IFrontendDatabase.dart';
+import 'package:time_manager/Database/FileDatabase/FileDatabase.dart';
+import 'package:time_manager/Database/Interfaces/IBackendDatabase.dart';
+import 'package:time_manager/Database/Interfaces/IFrontendDatabase.dart';
+import 'package:time_manager/Database/Objects/CategoryObject.dart';
+import 'package:time_manager/Database/Objects/DatabaseResponseObject.dart';
+import 'package:time_manager/Utilities/helpers.dart';
 
-import '../helpers.dart';
 import 'Objects/ActivityObject.dart';
 
 class DatabaseHandler implements IFrontendDatabase {

@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
-import 'package:time_manager/persistence/Objects/ActivityObject.dart';
+import 'package:time_manager/Database/Objects/ActivityObject.dart';
+import 'package:time_manager/Database/Objects/CategoryObject.dart';
+import 'package:time_manager/Utilities/Pair.dart';
+import 'package:time_manager/Utilities/helpers.dart';
 
-import '../Pair.dart';
-import '../persistence/Objects/CategoryObject.dart';
-import 'ActivityManipulation.dart';
+import '../Utilities/ActivityManipulation.dart';
 
 class DiagramViewModel {
   static final DiagramViewModel _singleton = DiagramViewModel._internal();

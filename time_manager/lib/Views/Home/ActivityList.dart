@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:rxdart/streams.dart';
-import 'package:time_manager/Processing/ActivityManipulation.dart';
-import 'package:time_manager/Processing/MainViewModel.dart';
-import 'package:time_manager/persistence/Objects/ActivityObject.dart';
+import 'package:time_manager/Database/Objects/ActivityObject.dart';
+import 'package:time_manager/Logic/MainViewModel.dart';
+import 'package:time_manager/Utilities/ActivityManipulation.dart';
+import 'package:time_manager/Utilities/helpers.dart';
 
-import '../helpers.dart';
 
 class ActivityList extends StatelessWidget {
   ActivityList({Key? key}) : super(key: key);

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:time_manager/Processing/MainViewModel.dart';
-import 'package:time_manager/persistence/DatabaseHandler.dart';
-import 'package:time_manager/persistence/Interfaces/IFrontendDatabase.dart';
-import '../persistence/Objects/ActivityObject.dart';
-import 'ActivityManipulation.dart';
+import 'package:time_manager/Database/DatabaseHandler.dart';
+import 'package:time_manager/Database/Interfaces/IFrontendDatabase.dart';
+import 'package:time_manager/Database/Objects/ActivityObject.dart';
+import 'package:time_manager/Logic/MainViewModel.dart';
+import '../Utilities/ActivityManipulation.dart';
 
 class AddActivityViewModel {
   static final AddActivityViewModel _singleton = AddActivityViewModel._internal();
@@ -14,7 +14,7 @@ class AddActivityViewModel {
 
   MainViewModel mainViewModel = MainViewModel();
 
-  IFrontendDatabase storage = DatabaseHandler();
+  DatabaseHandler storage = DatabaseHandler();
 
   void setInterval(TimeOfDay starttime, TimeOfDay endtime) async {
     DateTime selectedDate = await mainViewModel.getFocusDay().first;

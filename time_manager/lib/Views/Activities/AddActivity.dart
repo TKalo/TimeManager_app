@@ -12,50 +12,41 @@ class AddActivity extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    TextEditingController timeContoller = TextEditingController();
 
     return Material(
-      child: ListView(padding: const EdgeInsets.all(48), children: [
-        Form(
-          key: _formKey,
-          child: Wrap(
-            alignment: WrapAlignment.center,
-            runAlignment: WrapAlignment.center,
-            runSpacing: 32,
-            direction: Axis.horizontal,
-            children: [
-              Row(
-                children: [
-                  const Expanded(
-                    child: CategoryDropDown(),
-                  ),
-                  IconButton(onPressed: () => Navigator.pushNamed(context, routes.categoryList.name), icon: const Icon(Icons.edit))
-                ],
-              ),
-              TextFormField(
-                decoration: const InputDecoration(labelText: 'Activity Name', border: OutlineInputBorder()),
-                maxLength: 30,
-                onChanged: (string) => ActivityViewModel().activity.name = string,
-              ),
-              TextFormField(
-                keyboardType: TextInputType.multiline,
-                decoration: const InputDecoration(labelText: 'Activity Description', border: OutlineInputBorder()),
-                maxLines: 10,
-                onChanged: (string) => ActivityViewModel().activity.description = string,
-              ),
-              TextFormField(
+      child: Center(
+        child: ListView(shrinkWrap: true, padding: const EdgeInsets.all(48), children: [
+          Form(
+            key: _formKey,
+            child: Wrap(
+              alignment: WrapAlignment.center,
+              runAlignment: WrapAlignment.center,
+              runSpacing: 32,
+              direction: Axis.horizontal,
+              children: [
+                Row(
+                  children: [
+                    const Expanded(
+                      child: CategoryDropDown(),
+                    ),
+                    IconButton(onPressed: () => Navigator.pushNamed(context, routes.categoryList.name), icon: const Icon(Icons.edit))
+                  ],
+                ),
+                TextFormField(
                   controller: timeContoller,
                   keyboardType: TextInputType.multiline,
                   decoration: const InputDecoration(labelText: 'Activity time *', border: OutlineInputBorder()),
                   readOnly: true,
-                  onTap: () => ActivityViewModel().pickTime(context)),
-              TextButton(
+                  validator: (value) => value != null ? null : 'please pick time interval',
+                  onTap: () => ActivityViewModel().pickTime(context).then((timestring) => timeContoller.text = timestring)),
+                TextButton(
                   onPressed: () => onSubmitButtonPress(context),
                   child: Container(width: double.infinity, alignment: Alignment.center, height: 48, child: const Text('submit', style: TextStyle(fontSize: 18))))
-            ],
+              ],
+            ),
           ),
-        ),
-      ]),
+        ]),
+      ),
     );
   }
 
@@ -77,6 +68,7 @@ class CategoryDropDown extends StatelessWidget {
           List<Category> categories = snapshot.data ?? [];
           return DropdownButtonFormField<Category>(
             onChanged: (item) => ActivityViewModel().activity.category = item?.name ?? '',
+            validator: (value) => value != null ? null : 'please choose a category',
             items: categories
                 .map((category) => DropdownMenuItem(
                       child: Text(category.name),

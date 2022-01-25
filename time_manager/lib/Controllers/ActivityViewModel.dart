@@ -30,7 +30,7 @@ class ActivityViewModel {
 
     activity.endtime = DateTime(selectedDate.year, selectedDate.month, selectedDate.day, interval.endTime.hour, interval.endTime.minute);
 
-    return interval.startTime.format(context) + " - " + interval.endTime.format(context);
+    return timeOfDayToTimeString(interval.startTime) + " - " + timeOfDayToTimeString(interval.endTime);
   }
 
   void submitActivity(BuildContext context) async {
@@ -55,7 +55,12 @@ class ActivityViewModel {
             title: const Text('other activities intersect the selected time interval'),
             actions: [
               TextButton(onPressed: () => _persistActivities(cropSingleActivity(intersectingActivities, activity), context), child: const Text('crop this activity')),
-              TextButton(onPressed: () => _persistActivities(cropListOfActivities(intersectingActivities, activity), context), child: const Text('crop other activities')),
+              TextButton(
+                  onPressed: () {
+                    _persistActivities([activity, ...cropListOfActivities(intersectingActivities, activity)], context);
+                    intersectingActivities.forEach((intersectingActivity) => deleteActivity(intersectingActivity));
+                  },
+                  child: const Text('crop other activities')),
               TextButton(onPressed: () => Navigator.pop(context), child: const Text('cancel'))
             ],
           );

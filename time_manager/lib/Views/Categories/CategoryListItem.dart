@@ -15,7 +15,7 @@ class CategoryListItem extends StatelessWidget {
       onDismissed: (DismissDirection direction) => CategoryViewModel().deleteCategory(category),
       confirmDismiss: (DismissDirection direction) => confirmDismiss(context),
       child: CustomListTile(
-        leadingColor: Colors.red,
+        leadingColor: category.color,
         title: category.name,
       ),
       background: const ListDeleteBackground(),

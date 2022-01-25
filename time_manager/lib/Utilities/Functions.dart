@@ -1,11 +1,11 @@
-
 import 'package:flutter/material.dart';
 import 'package:time_manager/Database/Objects/Activity.dart';
 import 'package:time_manager/Database/Objects/Category.dart';
 import 'package:time_manager/Utilities/Objects.dart';
 
+String dateTimeToTimeString(DateTime dateTime) => dateTime.hour.toString().padLeft(2, '0') + ":" + dateTime.minute.toString().padLeft(2, '0');
 
-String getTimeString(DateTime dateTime) => dateTime.hour.toString().padLeft(2, '0') + ":" + dateTime.minute.toString().padLeft(2, '0');
+String timeOfDayToTimeString(TimeOfDay timeOfDay) => timeOfDay.hour.toString().padLeft(2, '0') + ":" + timeOfDay.minute.toString().padLeft(2, '0');
 
 T notNullOrFail<T>(T? object) {
   if (object == null) NullThrownError();
@@ -21,9 +21,10 @@ List<Activity> cropSingleActivity(List<Activity> activities, activity) {
   for (Activity existingActivity in activities) {
     List<Activity> tempList = [];
 
-    croppedList.forEach((element) => tempList.addAll(_cropActivity(activity, existingActivity)));
+    croppedList.forEach((element) => tempList.addAll(_cropActivity(element, existingActivity)));
 
     croppedList = tempList;
+
   }
 
   return croppedList..sort((a, b) => a.starttime.compareTo(b.starttime));
@@ -34,7 +35,7 @@ List<Activity> cropListOfActivities(List<Activity> activities, Activity activity
   List<Activity> croppedList = [];
 
   activities.forEach((existingActivity) => croppedList.addAll(_cropActivity(existingActivity, activity)));
-
+  
   return croppedList..sort((a, b) => a.starttime.compareTo(b.starttime));
 }
 
@@ -44,7 +45,7 @@ List<Activity> _cropActivity(Activity toCrop, Activity notToCrop) {
   if ((toCrop.starttime.isAfter(notToCrop.starttime) || toCrop.starttime.isAtSameMomentAs(notToCrop.starttime)) &&
       (toCrop.endtime.isBefore(notToCrop.endtime) || toCrop.endtime.isAtSameMomentAs(notToCrop.endtime))) return [];
 
-  //to notToCrop is inside toCrop, an toCrop is split in two
+  //notToCrop is inside toCrop, an toCrop is split in two
   if (toCrop.starttime.isBefore(notToCrop.starttime) && toCrop.endtime.isAfter(notToCrop.endtime)) {
     return [toCrop.copy()..endtime = notToCrop.starttime, toCrop.copy()..starttime = notToCrop.endtime];
   }
@@ -90,21 +91,25 @@ List<Activity> getActivitiesOfDay(List<Activity> activities, DateTime date) {
 }
 
 List<Pair<Activity, Color?>> getActivitiesWithColors(List<Activity> activities, List<Category> categories) {
-  Map<String,Color> categoryMap = Map.fromEntries(categories.map((category) => MapEntry(category.name, category.color))); 
+  Map<String, Color> categoryMap = Map.fromEntries(categories.map((category) => MapEntry(category.name, category.color)));
   return activities.map((activity) => Pair(first: activity, last: categoryMap[activity.category])).toList();
 }
 
 List<Pair<Activity, Color?>> getDiagramData(List<Activity> activities, DateTime date, List<Category> categories) {
-    activities = getActivitiesOfDay(activities, date);
+  activities = getActivitiesOfDay(activities, date);
 
-    Activity defaultActivity = Activity(starttime: DateTime(date.year, date.month, date.day, 0, 0), endtime: DateTime(date.year, date.month, date.day, 23, 59), category: 'default');
+  Activity defaultActivity = Activity(starttime: DateTime(date.year, date.month, date.day, 0, 0), endtime: DateTime(date.year, date.month, date.day, 23, 59), category: 'default');
 
-    activities = activities..addAll(cropSingleActivity(activities, defaultActivity));
+  List<Activity> defact = cropSingleActivity(activities, defaultActivity);
 
-    sortActivitiesByDateTime(activities);
+  print(defact.map((e) => 'defact: ' + dateTimeToTimeString(e.starttime) + ' - ' + dateTimeToTimeString(e.endtime)));
 
-    return getActivitiesWithColors(activities, categories);
-  }
+  activities = activities..addAll(cropSingleActivity(activities, defaultActivity));
+
+  sortActivitiesByDateTime(activities);
+
+  return getActivitiesWithColors(activities, categories);
+}
 
 void sortActivitiesByDateTime(List<Activity> activities) {
   activities.sort((a, b) => a.starttime.compareTo(b.starttime));

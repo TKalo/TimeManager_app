@@ -41,7 +41,7 @@ class CategoryViewModel {
   void submitActivity(BuildContext context) async {
     DatabaseResponse<void> response = await DatabaseHandler().addCategory(category);
     if (response.success) {
-      Navigator.pushNamed(context, routes.categoryList.name);
+      Navigator.pop(context);
       _resetCategoryObject();
     } else {
       _globalError.add(response.error ?? 'unknown error');

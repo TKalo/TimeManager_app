@@ -13,10 +13,10 @@ class ActivityListItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Dismissible(
-      key: ValueKey<Activity>(activity),
+      key: Key(activity.id.toString()),
       onDismissed: (DismissDirection direction) => ActivityViewModel().deleteActivity(activity),
       confirmDismiss: (DismissDirection direction) => confirmDismiss(context),
-      child: CustomListTile(leadingColor: color, title: activity.name == '' ? activity.category : activity.name, subTitle: getTimeString(activity.starttime) + " - " + getTimeString(activity.endtime)),
+      child: CustomListTile(leadingColor: color, title: activity.name == '' ? activity.category : activity.name, subTitle: dateTimeToTimeString(activity.starttime) + " - " + dateTimeToTimeString(activity.endtime)),
       background: const ListDeleteBackground(),
     );
   }

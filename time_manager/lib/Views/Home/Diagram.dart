@@ -22,7 +22,6 @@ class Diagram extends StatelessWidget {
     return StreamBuilder<List<Pair<Activity, Color?>>>(
       stream: stream,
       builder: (BuildContext context, AsyncSnapshot<List<Pair<Activity, Color?>>> snapshot) {
-        print(snapshot.data?.map((activity) => dateTimeToTimeString(activity.first.starttime) + ' - ' + dateTimeToTimeString(activity.first.endtime)).toString());
         return SfCircularChart(
           series: <DoughnutSeries<Pair<Activity, Color?>, String>>[
             DoughnutSeries(

@@ -102,8 +102,6 @@ List<Pair<Activity, Color?>> getDiagramData(List<Activity> activities, DateTime 
 
   List<Activity> defact = cropSingleActivity(activities, defaultActivity);
 
-  print(defact.map((e) => 'defact: ' + dateTimeToTimeString(e.starttime) + ' - ' + dateTimeToTimeString(e.endtime)));
-
   activities = activities..addAll(cropSingleActivity(activities, defaultActivity));
 
   sortActivitiesByDateTime(activities);

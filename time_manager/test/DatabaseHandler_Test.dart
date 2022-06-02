@@ -1,9 +1,9 @@
 import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
-import 'package:time_manager/Database/DatabaseHandler.dart';
-import 'package:time_manager/Database/Objects/Activity.dart';
-import 'package:time_manager/Utilities/Functions.dart';
+import 'package:time_manager/Database/database_handler.dart';
+import 'package:time_manager/Database/Objects/activity.dart';
+import 'package:time_manager/Utilities/functions.dart';
 
 main() {
   DatabaseHandler database = DatabaseHandler(debug: true);

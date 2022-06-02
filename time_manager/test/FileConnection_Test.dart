@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:path_provider/path_provider.dart';
-import 'package:time_manager/Database/FileDatabase/FileConnection.dart';
+import 'package:time_manager/Database/FileDatabase/file_connection.dart';
 
 main() {
   String filename = 'random_file';

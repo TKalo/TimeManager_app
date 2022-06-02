@@ -1,7 +1,7 @@
 
 import 'package:time_manager/Database/Interfaces/i_database.dart';
-import 'package:time_manager/Database/Objects/Activity.dart';
-import 'package:time_manager/Database/Objects/Category.dart';
+import 'package:time_manager/Database/Objects/activity.dart';
+import 'package:time_manager/Database/Objects/category.dart';
 
 abstract class IFrontendDatabase implements IDatabase {
 

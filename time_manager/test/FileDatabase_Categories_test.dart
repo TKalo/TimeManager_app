@@ -5,9 +5,9 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:rxdart/subjects.dart';
 import 'package:time_manager/Database/FileDatabase/CategoryDatabase.dart';
 import 'package:time_manager/Database/FileDatabase/FileDatabase.dart';
-import 'package:time_manager/Database/Objects/Category.dart';
+import 'package:time_manager/Database/Objects/category.dart';
 import 'package:time_manager/Database/Objects/DatabaseResponse.dart';
-import 'package:time_manager/Utilities/Functions.dart';
+import 'package:time_manager/Utilities/functions.dart';
 
 main() {
   final FileDatabase database = FileDatabase(debug: true);

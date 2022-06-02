@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:time_manager/Utilities/Objects.dart';
-import 'package:time_manager/Views/Activities/ActivityList.dart';
-import 'Head.dart';
+import 'package:time_manager/Utilities/objects.dart';
+import 'package:time_manager/Views/Activities/activity_list.dart';
+import 'head.dart';
 
 class Home extends StatelessWidget {
   const Home({Key? key}) : super(key: key);
@@ -18,7 +18,6 @@ class Home extends StatelessWidget {
           )
         ],
       ),
-      
       floatingActionButton: FloatingActionButton(
         onPressed: () => Navigator.pushNamed(context, routes.addActivity.name),
         child: const Icon(Icons.add),

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:time_manager/Database/Objects/Category.dart';
-import 'package:time_manager/Controllers/CategoryViewModel.dart';
-import 'package:time_manager/Utilities/Widgets.dart';
+import 'package:time_manager/Controllers/category_viewmodel.dart';
+import 'package:time_manager/Database/Objects/category.dart';
+import 'package:time_manager/Utilities/widgets.dart';
 
 class CategoryListItem extends StatelessWidget {
   const CategoryListItem({Key? key, required this.category}) : super(key: key);

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:time_manager/Database/Objects/Activity.dart';
-import 'package:time_manager/Database/Objects/Category.dart';
-import 'package:time_manager/Utilities/Objects.dart';
+import 'package:time_manager/Database/Objects/activity.dart';
+import 'package:time_manager/Database/Objects/category.dart';
+import 'package:time_manager/Utilities/objects.dart';
 
 String dateTimeToTimeString(DateTime dateTime) => dateTime.hour.toString().padLeft(2, '0') + ":" + dateTime.minute.toString().padLeft(2, '0');
 

@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:rxdart/rxdart.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
-import 'package:time_manager/Database/Objects/Activity.dart';
-import 'package:time_manager/Database/Objects/Category.dart';
+import 'package:time_manager/Database/Objects/activity.dart';
+import 'package:time_manager/Database/Objects/category.dart';
 
-import 'package:time_manager/Controllers/MainViewModel.dart';
-import 'package:time_manager/Utilities/Functions.dart';
-import 'package:time_manager/Utilities/Objects.dart';
+import 'package:time_manager/Controllers/main_viewmodel.dart';
+import 'package:time_manager/Utilities/functions.dart';
+import 'package:time_manager/Utilities/objects.dart';
 
 class Diagram extends StatelessWidget {
   const Diagram({Key? key}) : super(key: key);

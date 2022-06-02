@@ -5,7 +5,7 @@ import 'package:time_manager/Database/Objects/Category.dart';
 import 'package:time_manager/Database/Objects/DatabaseResponse.dart';
 
 abstract class IDatabase {
-  Future<DatabaseResponse<int>> addActivity(Activity object);
+  Future<DatabaseResponse<String>> addActivity(Activity object);
 
   Future<DatabaseResponse<void>> updateActivity(Activity object);
 

@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:time_manager/Utilities/Objects.dart';
-import 'package:time_manager/Views/Categories/AddCategory.dart';
-import 'package:time_manager/Views/Activities/AddActivity.dart';
-import 'package:time_manager/Views/Categories/CategoryList.dart';
-import 'package:time_manager/Views/Home/Home.dart';
+import 'package:time_manager/Utilities/objects.dart';
+import 'package:time_manager/Views/Categories/add_category.dart';
+import 'package:time_manager/Views/Activities/add_activity.dart';
+import 'package:time_manager/Views/Categories/category_list.dart';
+import 'package:time_manager/Views/Home/home.dart';
 
 void main() {
   runApp(const MyApp());

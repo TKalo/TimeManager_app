@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:rxdart/streams.dart';
-import 'package:time_manager/Database/Objects/Activity.dart';
-import 'package:time_manager/Database/Objects/Category.dart';
-import 'package:time_manager/Controllers/MainViewModel.dart';
-import 'package:time_manager/Utilities/Functions.dart';
-import 'package:time_manager/Utilities/Objects.dart';
-import 'package:time_manager/Views/Activities/ActivityListItem.dart';
+import 'package:time_manager/Controllers/main_viewmodel.dart';
+import 'package:time_manager/Database/Objects/activity.dart';
+import 'package:time_manager/Database/Objects/category.dart';
+import 'package:time_manager/Utilities/functions.dart';
+import 'package:time_manager/Utilities/objects.dart';
+import 'package:time_manager/Views/Activities/activity_list_item.dart';
 
 class ActivityList extends StatelessWidget {
   const ActivityList({Key? key}) : super(key: key);

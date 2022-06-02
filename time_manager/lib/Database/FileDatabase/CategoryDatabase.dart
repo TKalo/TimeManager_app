@@ -1,9 +1,9 @@
 import 'dart:convert';
-import 'package:time_manager/Database/Objects/Category.dart';
+import 'package:time_manager/Database/Objects/category.dart';
 import 'package:time_manager/Database/Objects/DatabaseResponse.dart';
-import 'package:time_manager/Utilities/Functions.dart';
+import 'package:time_manager/Utilities/functions.dart';
 
-import 'FileConnection.dart';
+import 'file_connection.dart';
 
 class CategoryDatabase {
   final FileConnection connection;

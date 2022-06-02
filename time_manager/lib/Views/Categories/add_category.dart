@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:time_manager/Controllers/CategoryViewModel.dart';
+import 'package:time_manager/Controllers/category_viewmodel.dart';
 
 class AddCategory extends StatelessWidget {
   AddCategory({Key? key}) : super(key: key);

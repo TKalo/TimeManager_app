@@ -1,9 +1,9 @@
 import 'package:intl/intl.dart';
 import 'package:rxdart/rxdart.dart';
-import 'package:time_manager/Database/DatabaseHandler.dart';
-import 'package:time_manager/Database/Objects/Activity.dart';
-import 'package:time_manager/Database/Objects/Category.dart';
-import 'package:time_manager/Utilities/Values.dart';
+import 'package:time_manager/Database/database_handler.dart';
+import 'package:time_manager/Database/Objects/activity.dart';
+import 'package:time_manager/Database/Objects/category.dart';
+import 'package:time_manager/Utilities/values.dart';
 
 class MainViewModel {
   static final MainViewModel _singleton = MainViewModel._internal();

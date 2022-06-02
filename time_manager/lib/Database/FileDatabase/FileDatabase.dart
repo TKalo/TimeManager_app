@@ -2,12 +2,12 @@
 
 import 'package:time_manager/Database/FileDatabase/ActivityDatabase.dart';
 import 'package:time_manager/Database/FileDatabase/CategoryDatabase.dart';
-import 'package:time_manager/Database/Interfaces/IBackendDatabase.dart';
-import 'package:time_manager/Database/Objects/Activity.dart';
-import 'package:time_manager/Database/Objects/Category.dart';
+import 'package:time_manager/Database/Interfaces/i_backend_database.dart';
+import 'package:time_manager/Database/Objects/activity.dart';
+import 'package:time_manager/Database/Objects/category.dart';
 import 'package:time_manager/Database/Objects/DatabaseResponse.dart';
 
-import 'FileConnection.dart';
+import 'file_connection.dart';
 
 class FileDatabase implements IBackendDatabase {
   final bool debug;
@@ -31,7 +31,7 @@ class FileDatabase implements IBackendDatabase {
   Future<DatabaseResponse<void>> updateCategory(Category category) => _categoryDB.updatecategory(category);
 
   @override
-  Future<DatabaseResponse<int>> addActivity(Activity activity) => _activityDB.addActivity(activity);
+  Future<DatabaseResponse<String>> addActivity(Activity activity) => _activityDB.addActivity(activity);
 
   @override
   Future<DatabaseResponse<void>> deleteActivity(Activity activity) => _activityDB.deleteActivity(activity);

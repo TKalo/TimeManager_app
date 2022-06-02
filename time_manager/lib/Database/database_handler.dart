@@ -1,17 +1,18 @@
 import 'package:rxdart/rxdart.dart';
 import 'package:synchronized/synchronized.dart';
 import 'package:time_manager/Database/FileDatabase/FileDatabase.dart';
-import 'package:time_manager/Database/Interfaces/IBackendDatabase.dart';
-import 'package:time_manager/Database/Interfaces/IFrontendDatabase.dart';
-import 'package:time_manager/Database/Objects/Activity.dart';
-import 'package:time_manager/Database/Objects/Category.dart';
+import 'package:time_manager/Database/Interfaces/i_backend_database.dart';
+import 'package:time_manager/Database/Interfaces/i_frontend_database.dart';
+import 'package:time_manager/Database/MongoDatabase/mongo_database.dart';
+import 'package:time_manager/Database/Objects/activity.dart';
+import 'package:time_manager/Database/Objects/category.dart';
 import 'package:time_manager/Database/Objects/DatabaseResponse.dart';
-import 'package:time_manager/Utilities/Functions.dart';
+import 'package:time_manager/Utilities/functions.dart';
 
 class DatabaseHandler implements IFrontendDatabase {
   static DatabaseHandler? _singleton;
   factory DatabaseHandler({bool debug = false}) => _singleton ?? (_singleton = DatabaseHandler._internal(debug: debug));
-  DatabaseHandler._internal({bool debug = false}) : _storage = FileDatabase(debug: debug) {
+  DatabaseHandler._internal({bool debug = false}) : _storage = MongoDatabase() {
     _updateStream<Activity>(() => _storage.getActivities(), _activities);
     _updateStream<Category>(() => _storage.getCategories(), _categories);
   }
@@ -32,8 +33,8 @@ class DatabaseHandler implements IFrontendDatabase {
   Stream<List<Category>> getCategories() => _categories.stream;
 
   @override
-  Future<DatabaseResponse<int>> addActivity(Activity activity) {
-    return _activityDatabaseFunction<int>(execution: () => _storage.addActivity(activity));
+  Future<DatabaseResponse<String>> addActivity(Activity activity) {
+    return _activityDatabaseFunction<String>(execution: () => _storage.addActivity(activity));
   }
 
   @override

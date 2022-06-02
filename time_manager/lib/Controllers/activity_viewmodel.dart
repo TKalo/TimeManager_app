@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:rxdart/subjects.dart';
-import 'package:time_manager/Database/DatabaseHandler.dart';
-import 'package:time_manager/Database/Objects/Activity.dart';
+import 'package:time_manager/Database/database_handler.dart';
+import 'package:time_manager/Database/Objects/activity.dart';
 import 'package:time_manager/Database/Objects/DatabaseResponse.dart';
-import 'package:time_manager/Controllers/MainViewModel.dart';
+import 'package:time_manager/Controllers/main_viewmodel.dart';
 import 'package:time_range_picker/time_range_picker.dart';
-import 'package:time_manager/Utilities/Functions.dart';
-import 'package:time_manager/Utilities/Objects.dart';
+import 'package:time_manager/Utilities/functions.dart';
+import 'package:time_manager/Utilities/objects.dart';
 
 class ActivityViewModel {
   static final ActivityViewModel _singleton = ActivityViewModel._internal();
@@ -70,10 +70,10 @@ class ActivityViewModel {
   void _persistActivities(List<Activity> activities, BuildContext context) async {
     String? error;
     for (Activity activity in activities) {
-      DatabaseResponse<int> response = await DatabaseHandler().addActivity(activity);
+      DatabaseResponse<String> response = await DatabaseHandler().addActivity(activity);
 
       if (response.success) {
-        activity.id = response.result ?? -1;
+        activity.id = response.result ?? '';
       } else {
         error = response.error;
         break;

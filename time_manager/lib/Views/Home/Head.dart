@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:time_manager/Controllers/MainViewModel.dart';
-import 'package:time_manager/Views/Home/Diagram.dart';
+import 'package:time_manager/Controllers/main_viewmodel.dart';
+import 'package:time_manager/Views/Home/diagram.dart';
 
 class Head extends StatelessWidget {
   const Head({Key? key}) : super(key: key);

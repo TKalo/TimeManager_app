@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_colorpicker/flutter_colorpicker.dart';
 import 'package:rxdart/subjects.dart';
-import 'package:time_manager/Database/DatabaseHandler.dart';
-import 'package:time_manager/Database/Objects/Category.dart';
+import 'package:time_manager/Database/database_handler.dart';
+import 'package:time_manager/Database/Objects/category.dart';
 import 'package:time_manager/Database/Objects/DatabaseResponse.dart';
-import 'package:time_manager/Utilities/Objects.dart';
+import 'package:time_manager/Utilities/objects.dart';
 
 
 class CategoryViewModel {

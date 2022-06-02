@@ -1,5 +1,5 @@
 
-import 'package:time_manager/Database/Interfaces/IDatabase.dart';
+import 'package:time_manager/Database/Interfaces/i_database.dart';
 import 'package:time_manager/Database/Objects/Activity.dart';
 import 'package:time_manager/Database/Objects/Category.dart';
 

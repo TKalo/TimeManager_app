@@ -1,16 +1,16 @@
 import 'dart:convert';
-import 'package:time_manager/Database/Objects/Activity.dart';
+import 'package:time_manager/Database/Objects/activity.dart';
 import 'package:time_manager/Database/Objects/DatabaseResponse.dart';
-import 'package:time_manager/Utilities/Functions.dart';
+import 'package:time_manager/Utilities/functions.dart';
 
-import 'FileConnection.dart';
+import 'file_connection.dart';
 
 class ActivityDatabase {
   final FileConnection connection;
 
   ActivityDatabase({required this.connection});
 
-  Future<DatabaseResponse<int>> addActivity(Activity activity) async {
+  Future<DatabaseResponse<String>> addActivity(Activity activity) async {
     try {
       //get existing activies
       List<Activity> activities = notNullOrFail((await getActivities()).result);
@@ -24,7 +24,7 @@ class ActivityDatabase {
       //persist new activity list
       await connection.overwriteDatabase(activityToJson(activities));
 
-      return DatabaseResponse<int>.success(result: activity.id);
+      return DatabaseResponse<String>.success(result: activity.id);
     } catch (e) {
       return DatabaseResponse.error(error: e.toString());
     }
@@ -78,12 +78,12 @@ class ActivityDatabase {
     }
   }
 
-  int getUnusedId(List<Activity> activities) {
+  String getUnusedId(List<Activity> activities) {
     int id = 0;
 
-    for (id; id < 10000; id++) if (!activities.any((activity) => activity.id == id)) break;
+    for (id; id < 10000; id++) if (!activities.any((activity) => activity.id == id.toString())) break;
 
-    return id;
+    return id.toString();
   }
 
 }

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:time_manager/Database/Objects/Activity.dart';
-import 'package:time_manager/Controllers/ActivityViewModel.dart';
-import 'package:time_manager/Utilities/Functions.dart';
-import 'package:time_manager/Utilities/Widgets.dart';
+import 'package:time_manager/Controllers/activity_viewmodel.dart';
+import 'package:time_manager/Database/Objects/activity.dart';
+import 'package:time_manager/Utilities/functions.dart';
+import 'package:time_manager/Utilities/widgets.dart';
 
 class ActivityListItem extends StatelessWidget {
   const ActivityListItem({Key? key, required this.activity, required this.color}) : super(key: key);

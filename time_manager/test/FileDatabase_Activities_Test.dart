@@ -4,8 +4,8 @@ import 'package:rxdart/rxdart.dart';
 import 'package:test/test.dart';
 import 'package:time_manager/Database/FileDatabase/ActivityDatabase.dart';
 import 'package:time_manager/Database/FileDatabase/FileDatabase.dart';
-import 'package:time_manager/Database/Objects/Activity.dart';
-import 'package:time_manager/Utilities/Functions.dart';
+import 'package:time_manager/Database/Objects/activity.dart';
+import 'package:time_manager/Utilities/functions.dart';
 
 main() {
   final FileDatabase database = FileDatabase(debug: true);
@@ -23,9 +23,9 @@ main() {
 
   test('Check correct formatting', () {
     Activity activity1 =
-        Activity(id: 1, starttime: DateTime(2001, 01, 01, 01, 01), endtime: DateTime(2002, 02, 02, 02, 02), category: 'category1', name: 'name1', description: 'description1');
+        Activity(id: '1', starttime: DateTime(2001, 01, 01, 01, 01), endtime: DateTime(2002, 02, 02, 02, 02), category: 'category1', name: 'name1', description: 'description1');
     Activity activity2 =
-        Activity(id: 2, starttime: DateTime(2002, 02, 02, 02, 02), endtime: DateTime(2001, 01, 01, 01, 01), category: 'category2', name: 'name2', description: 'description2');
+        Activity(id: '2', starttime: DateTime(2002, 02, 02, 02, 02), endtime: DateTime(2001, 01, 01, 01, 01), category: 'category2', name: 'name2', description: 'description2');
     List<Activity> activities = [activity1, activity2];
 
     String json = activityToJson(activities);
@@ -71,7 +71,7 @@ main() {
       StreamSubscription? sub;
       sub = testOrder.stream.listen((order) async {
         if (order == 2) {
-          int id = -2;
+          String id = '-2';
           DateTime startTime = DateTime(2001, 01, 01, 01, 01);
           DateTime endTime = DateTime(2002, 02, 02, 02, 02);
           String category = 'category';

@@ -1,15 +1,15 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:time_manager/Database/Objects/Activity.dart';
-import 'package:time_manager/Utilities/Functions.dart';
+import 'package:time_manager/Database/Objects/activity.dart';
+import 'package:time_manager/Utilities/functions.dart';
 
 
 main() {
-  Activity object0 = Activity(id: 0, starttime: DateTime(2000, 1, 0, 0), endtime: DateTime(2000, 1, 0, 2), category: 'category');
-  Activity object1 = Activity(id: 0, starttime: DateTime(2000, 1, 0, 1), endtime: DateTime(2000, 1, 0, 3), category: 'category');
-  Activity object2 = Activity(id: 0, starttime: DateTime(2000, 1, 0, 2), endtime: DateTime(2000, 1, 0, 4), category: 'category');
-  Activity object3 = Activity(id: 0, starttime: DateTime(2000, 1, 0, 3), endtime: DateTime(2000, 1, 0, 5), category: 'category');
-  Activity object4 = Activity(id: 0, starttime: DateTime(2000, 1, 0, 4), endtime: DateTime(2000, 1, 0, 6), category: 'category');
-  Activity object5 = Activity(id: 0, starttime: DateTime(2000, 1, 0, 1), endtime: DateTime(2000, 1, 0, 5), category: 'category');
+  Activity object0 = Activity(id: '0', starttime: DateTime(2000, 1, 0, 0), endtime: DateTime(2000, 1, 0, 2), category: 'category');
+  Activity object1 = Activity(id: '0', starttime: DateTime(2000, 1, 0, 1), endtime: DateTime(2000, 1, 0, 3), category: 'category');
+  Activity object2 = Activity(id: '0', starttime: DateTime(2000, 1, 0, 2), endtime: DateTime(2000, 1, 0, 4), category: 'category');
+  Activity object3 = Activity(id: '0', starttime: DateTime(2000, 1, 0, 3), endtime: DateTime(2000, 1, 0, 5), category: 'category');
+  Activity object4 = Activity(id: '0', starttime: DateTime(2000, 1, 0, 4), endtime: DateTime(2000, 1, 0, 6), category: 'category');
+  Activity object5 = Activity(id: '0', starttime: DateTime(2000, 1, 0, 1), endtime: DateTime(2000, 1, 0, 5), category: 'category');
 
   group('getIntersectingActivities', (){
     test('no intersecting', () {
